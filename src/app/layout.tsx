@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Noto_Sans, Playfair_Display } from "next/font/google
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar/Navbar";
-import { Footer } from "@/components/footer/Footer";
+import { FooterServer } from "@/components/footer/FooterServer";
 
 const playfairDisplayHeading = Playfair_Display({subsets:['latin'],variable:'--font-heading'});
 
@@ -37,7 +37,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar/>
         {children}
-        <Footer />
+        <FooterServer />
         </body>
     </html>
   );
