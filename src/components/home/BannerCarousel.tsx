@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Banner } from "@/service/banner.type";
 
@@ -56,6 +57,21 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                   {banner.description}
                 </p>
               )}
+              {/* CTA buttons */}
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center justify-center rounded-lg bg-foreground px-7 py-3 text-[11px] font-semibold tracking-widest text-background uppercase transition-opacity hover:opacity-80"
+                >
+                  Shop Now
+                </Link>
+                <Link
+                  href="/skin-quiz"
+                  className="inline-flex items-center justify-center rounded-lg border border-white/50 bg-white/10 px-7 py-3 text-[11px] font-semibold tracking-widest text-white uppercase backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  Find Your Serum
+                </Link>
+              </div>
             </div>
           </div>
         ))}
