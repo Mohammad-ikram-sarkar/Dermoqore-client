@@ -1,4 +1,4 @@
-import type { ProductListParams, ProductListResponse } from "./product.type";
+import type { ProductDetail, ProductListParams, ProductListResponse } from "./product.type";
 
 const BASE = process.env.API_URL ?? "http://localhost:8000";
 
@@ -25,4 +25,30 @@ export const ProductService = {
     if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
     return res.json();
   },
+
+  findBySlug: async (slug: string): Promise<ProductDetail> => {
+    const res = await fetch(`${BASE}/api/product/${slug}`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) throw new Error(`Failed to fetch product: ${res.status}`);
+    return res.json();
+  },
+
+  findRelated: async (
+    categoryId: string,
+    excludeId: string,
+    limit = 4,
+  ): Promise<ProductListResponse> => {
+    const res = await ProductService.findAll({
+      categoryId,
+      limit: limit + 1,
+    });
+
+    return {
+      ...res,
+      items: res.items.filter((p) => p.id !== excludeId).slice(0, limit),
+    };
+  },
 };
+

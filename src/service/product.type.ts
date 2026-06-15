@@ -33,6 +33,34 @@ export interface ProductListResponse {
   };
 }
 
+export interface Ingredient {
+  id: string;
+  name: string;
+  percentage: string | null;
+}
+
+export interface ProductUsageStep {
+  id: string;
+  stepNumber: number;
+  content: string;
+}
+
+export interface ProductSEO {
+  id: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeyword: string | null;
+}
+
+/** Full product detail — returned by GET /api/product/:slug */
+export interface ProductDetail extends Product {
+  description: string | null;
+  ingredients: Ingredient[];
+  howToUse: ProductUsageStep[];
+  seo: ProductSEO | null;
+  brand: { id: string; name: string; slug: string; logo: string | null } | null;
+}
+
 export interface ProductListParams {
   page?: number;
   limit?: number;
