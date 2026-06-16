@@ -109,7 +109,7 @@ export default function BenefitsSection() {
     <section className="w-full py-10 md:py-14">
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         {/* Heading */}
-        <h2 className="mb-6 text-center font-heading text-sm font-black tracking-[0.18em] text-foreground uppercase md:text-base">
+        <h2 className="mb-6 text-center text-sm font-black tracking-[0.18em] text-foreground uppercase md:text-base">
           Why Choose Dermoqore?
         </h2>
 

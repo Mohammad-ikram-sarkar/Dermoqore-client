@@ -58,7 +58,7 @@ export default function RoutineBanner() {
 
           {/* Headline + CTA */}
           <div className="mr-auto flex flex-col gap-3">
-            <h2 className="font-heading text-2xl font-black leading-tight tracking-[0.04em] text-foreground uppercase md:text-3xl">
+            <h2 className="text-2xl font-black leading-tight tracking-[0.04em] text-foreground uppercase md:text-3xl">
               Build Your<br />Perfect Routine
             </h2>
             <p className="text-[12px] tracking-[0.06em] text-muted-foreground">

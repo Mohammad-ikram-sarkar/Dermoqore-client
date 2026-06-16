@@ -75,7 +75,7 @@ export default async function ShopPage({
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
               Shop Skincare
             </p>
-            <h1 className="font-heading text-4xl font-semibold text-foreground md:text-5xl">
+            <h1 className="text-4xl font-semibold text-foreground md:text-5xl">
               Products for every routine
             </h1>
           </div>

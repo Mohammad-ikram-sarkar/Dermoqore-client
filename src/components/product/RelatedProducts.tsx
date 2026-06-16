@@ -23,7 +23,7 @@ export default function RelatedProducts({
           <p className="mb-1 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
             You may also like
           </p>
-          <h2 className="font-heading text-2xl font-semibold text-foreground md:text-3xl">
+          <h2 className="text-2xl font-semibold text-foreground md:text-3xl">
             More from {categoryName}
           </h2>
         </div>

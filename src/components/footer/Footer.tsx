@@ -126,7 +126,7 @@ export const Footer = memo(function Footer({ data }: FooterProps) {
           </p>
           <nav
             className={cn(
-              "font-heading font-normal leading-[1.15] text-foreground",
+              "font-normal leading-[1.15] text-foreground",
               "text-[clamp(28px,5vw,72px)]",
             )}
           >

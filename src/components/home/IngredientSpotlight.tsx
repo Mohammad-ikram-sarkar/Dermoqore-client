@@ -33,7 +33,7 @@ export default function IngredientSpotlight() {
     <section className="w-full py-12 md:py-16">
       <div className="mx-auto max-w-[1400px] px-6 md:px-10">
         {/* Heading */}
-        <h2 className="mb-8 text-center font-heading text-sm font-black tracking-[0.18em] text-foreground uppercase md:text-base">
+        <h2 className="mb-8 text-center text-sm font-black tracking-[0.18em] text-foreground uppercase md:text-base">
           Ingredient Spotlight
         </h2>
 

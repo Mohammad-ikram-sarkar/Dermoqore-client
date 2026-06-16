@@ -49,7 +49,7 @@ export default function ProductInfo({ product }: Props) {
       </div>
 
       {/* Title */}
-      <h1 className="font-heading text-3xl font-semibold leading-tight text-foreground md:text-4xl">
+      <h1 className="text-3xl font-semibold leading-tight text-foreground md:text-4xl">
         {product.name}
       </h1>
 

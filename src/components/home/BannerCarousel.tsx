@@ -29,7 +29,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
 
   return (
     <section className="relative w-full overflow-hidden">
-      <div className="relative h-[200px] w-full sm:h-[400px] md:h-[300px] lg:h-[400px]">
+      <div className="relative h-[200px] w-full sm:h-[400px] md:h-[300px] lg:h-[600px]">
         {banners.map((banner, i) => (
           <div
             key={banner.id}
@@ -49,9 +49,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
               >
                 {banner.tag}
               </span>
-              <h2 className="mt-3 text-2xl font-bold leading-tight md:text-4xl lg:text-5xl">
+              {/* <h2 className="mt-3 text-2xl font-bold  text-foreground md:text-4xl lg:text-5xl ">
                 {banner.title}
-              </h2>
+              </h2> */}
               {banner.description && (
                 <p className="mt-2 max-w-xl text-sm text-white/80 md:text-base lg:text-lg">
                   {banner.description}
@@ -61,13 +61,13 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center rounded-lg bg-foreground px-7 py-3 text-[11px] font-semibold tracking-widest text-background uppercase transition-opacity hover:opacity-80"
+                  className="inline-flex items-center justify-center rounded-[5px] bg-foreground px-7 py-3 text-[11px] font-semibold tracking-widest text-background uppercase transition-opacity hover:opacity-80"
                 >
                   Shop Now
                 </Link>
                 <Link
                   href="/skin-quiz"
-                  className="inline-flex items-center justify-center rounded-lg border border-white/50 bg-white/10 px-7 py-3 text-[11px] font-semibold tracking-widest text-white uppercase backdrop-blur-sm transition-colors hover:bg-white/20"
+                  className="inline-flex items-center justify-center rounded-[5px] border border-white/50 bg-white/10 px-7 py-3 text-[11px] font-semibold tracking-widest text-white uppercase backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
                   Find Your Serum
                 </Link>

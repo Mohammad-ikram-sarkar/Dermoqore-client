@@ -34,7 +34,7 @@ export default async function ContactPage() {
         <p className="text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase">
           Get in touch
         </p>
-        <h1 className="font-heading mt-3 text-3xl font-black tracking-[0.06em] text-foreground uppercase md:text-4xl">
+        <h1 className="mt-3 text-3xl font-black tracking-[0.06em] text-foreground uppercase md:text-4xl">
           Contact Us
         </h1>
         <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-muted-foreground">
@@ -48,7 +48,7 @@ export default async function ContactPage() {
 
           {/* Contact form */}
           <div className="flex flex-col gap-6">
-            <h2 className="font-heading text-base font-black tracking-widest text-foreground uppercase">
+            <h2 className="text-base font-black tracking-widest text-foreground uppercase">
               Send a Message
             </h2>
 
@@ -102,7 +102,7 @@ export default async function ContactPage() {
 
           {/* Contact info */}
           <div className="flex flex-col gap-8">
-            <h2 className="font-heading text-base font-black tracking-widest text-foreground uppercase">
+            <h2 className="text-base font-black tracking-widest text-foreground uppercase">
               Our Details
             </h2>
 
