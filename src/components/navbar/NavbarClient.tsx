@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Search, ShoppingCart, Menu, X, ShoppingBag, ShoppingBagIcon } from "lucide-react";
 import { AccountIcon } from "./icons";
 import { Button } from "@/components/ui/button";
@@ -32,26 +33,31 @@ export default function NavbarClient({
   activeHref,
 }: NavbarClientProps) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <>
       {/* ── Desktop nav ── */}
       <nav className="hidden lg:flex items-center gap-7">
-        {navLinks.map(({ label, href }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "relative text-[11px] font-medium tracking-[0.13em] uppercase transition-colors",
-              "after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-foreground after:transition-all after:duration-200 hover:after:w-full",
-              activeHref === href
-                ? "text-foreground after:w-full"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {label}
-          </Link>
-        ))}
+        {navLinks.map(({ label, href }) => {
+          const isActive = href === "/" ? pathname === href : pathname?.startsWith(href);
+          
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "relative text-[11px] font-medium tracking-[0.13em] uppercase transition-all duration-300",
+                "after:absolute after:-bottom-1 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#D46B5A] after:transition-all after:duration-300 hover:after:w-full",
+                isActive
+                  ? "text-[#D46B5A] after:w-full"
+                  : "text-muted-foreground hover:text-[#D46B5A]",
+              )}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* ── Icon group ── */}
@@ -130,23 +136,25 @@ export default function NavbarClient({
 
             {/* Mobile links */}
             <nav className="flex flex-col px-6 pt-4 pb-6">
-              {navLinks.map(({ label, href }, i) => (
+              {navLinks.map(({ label, href }, i) => {
+                const isActive = href === "/" ? pathname === href : pathname?.startsWith(href);
+                return (
                 <div key={href}>
                   <Link
                     href={href}
                     onClick={() => setOpen(false)}
                     className={cn(
                       "block py-3.5 text-[12px] font-medium tracking-[0.15em] uppercase transition-colors",
-                      activeHref === href
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground",
+                      isActive
+                        ? "text-[#D46B5A]"
+                        : "text-muted-foreground hover:text-[#D46B5A]",
                     )}
                   >
                     {label}
                   </Link>
                   {i < navLinks.length - 1 && <Separator />}
                 </div>
-              ))}
+              )})}
 
               {/* Mobile icon row */}
               <div className="mt-6 flex gap-3">
