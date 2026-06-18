@@ -1,6 +1,10 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import type { Product, ProductImage } from "@/service/product.type";
+import { useCheckoutStore } from "@/store/checkout-store";
 
 function formatPrice(price: number | string) {
   return `৳${Number(price).toLocaleString("en-BD")}`;
@@ -16,10 +20,16 @@ function getPrimaryImage(product: Product): ProductImage | { url: string; alt: s
   );
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  isBestSeller = false,
+}: {
+  product: Product;
+  isBestSeller?: boolean;
+}) {
+  const router = useRouter();
+  const addLine = useCheckoutStore((s) => s.addLine);
   const primaryImage = getPrimaryImage(product);
-  const isBestSeller =
-    product.comparePrice !== null || product.benefits?.some((benefit) => benefit.title);
 
   return (
     <article className="group relative overflow-hidden rounded-md border border-border bg-card">
@@ -56,7 +66,19 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
       <div className="flex items-center justify-between px-4 pb-4">
-        <button className="h-8 rounded border border-foreground px-4 text-[11px] font-bold uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background">
+        <button
+          onClick={() => {
+            addLine({
+              productId: product.id,
+              name: product.name,
+              image: primaryImage.url,
+              unitPrice: Number(product.price),
+              quantity: 1,
+            });
+            router.push("/cart");
+          }}
+          className="h-8 rounded border border-foreground px-4 text-[11px] font-bold uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background"
+        >
           Add to Cart
         </button>
         <button

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Heart, Minus, Plus, ShoppingBag, Truck } from "lucide-react";
 import type { ProductDetail } from "@/service/product.type";
+import { useCheckoutStore } from "@/store/checkout-store";
 
 function formatPrice(price: number | string) {
   return `৳${Number(price).toLocaleString("en-BD")}`;
@@ -20,8 +22,10 @@ interface Props {
 }
 
 export default function ProductInfo({ product }: Props) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isWished, setIsWished] = useState(false);
+  const addLine = useCheckoutStore((s) => s.addLine);
 
   const isOutOfStock = product.stock === 0 || product.status === "OUT_OF_STOCK";
   const isLowStock = !isOutOfStock && product.stock > 0 && product.stock <= 5;
@@ -141,6 +145,16 @@ export default function ProductInfo({ product }: Props) {
         {/* Add to Cart */}
         <button
           disabled={isOutOfStock}
+          onClick={() => {
+            addLine({
+              productId: product.id,
+              name: product.name,
+              image: product.images.find((i) => i.isPrimary)?.url ?? product.images[0]?.url,
+              unitPrice: Number(product.price),
+              quantity,
+            });
+            router.push("/cart");
+          }}
           className="group/btn flex h-12 flex-1 items-center justify-center gap-2.5 rounded-lg bg-foreground px-8 text-sm font-bold uppercase tracking-wider text-background transition-all hover:gap-3.5 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ShoppingBag className="size-[18px] transition-transform group-hover/btn:scale-110" />

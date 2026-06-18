@@ -10,12 +10,7 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-interface NavbarProps {
-  cartCount?: number;
-  activeHref?: string;
-}
-
-export default function Navbar({ cartCount = 2, activeHref = "/" }: NavbarProps) {
+export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-6 md:px-10">
@@ -29,11 +24,7 @@ export default function Navbar({ cartCount = 2, activeHref = "/" }: NavbarProps)
           </span>
         </Link>
 
-        <NavbarClient
-          navLinks={navLinks}
-          cartCount={cartCount}
-          activeHref={activeHref}
-        />
+        <NavbarClient navLinks={navLinks} />
       </div>
     </header>
   );

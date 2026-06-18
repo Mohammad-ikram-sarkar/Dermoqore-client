@@ -1,4 +1,4 @@
-import type { ProductDetail, ProductListParams, ProductListResponse } from "./product.type";
+import type { Product, ProductDetail, ProductListParams, ProductListResponse } from "./product.type";
 
 const BASE = process.env.API_URL ?? "http://localhost:8000";
 
@@ -23,6 +23,15 @@ export const ProductService = {
     });
 
     if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
+    return res.json();
+  },
+
+  findBestSellers: async (limit = 8): Promise<Product[]> => {
+    const res = await fetch(`${BASE}/api/product/best-sellers?limit=${limit}`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) throw new Error(`Failed to fetch best sellers: ${res.status}`);
     return res.json();
   },
 

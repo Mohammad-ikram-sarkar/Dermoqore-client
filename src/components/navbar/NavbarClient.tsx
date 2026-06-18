@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, ShoppingCart, Menu, X, ShoppingBag, ShoppingBagIcon } from "lucide-react";
+import { Search, Menu, X, ShoppingBag } from "lucide-react";
 import { AccountIcon } from "./icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useCheckoutStore } from "@/store/checkout-store";
 
 interface NavLink {
   label: string;
@@ -23,15 +24,12 @@ interface NavLink {
 
 interface NavbarClientProps {
   navLinks: NavLink[];
-  cartCount: number;
-  activeHref: string;
 }
 
 export default function NavbarClient({
   navLinks,
-  cartCount,
-  activeHref,
 }: NavbarClientProps) {
+  const cartCount = useCheckoutStore((s) => s.itemCount());
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
