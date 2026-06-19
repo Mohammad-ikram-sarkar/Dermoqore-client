@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, Menu, X, ShoppingBag } from "lucide-react";
@@ -29,7 +29,12 @@ interface NavbarClientProps {
 export default function NavbarClient({
   navLinks,
 }: NavbarClientProps) {
-  const cartCount = useCheckoutStore((s) => s.itemCount());
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true) }, []);
+
+  const rawCount = useCheckoutStore((s) => s.itemCount());
+  const cartCount = hydrated ? rawCount : 0;
+
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 

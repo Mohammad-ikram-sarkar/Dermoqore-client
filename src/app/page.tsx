@@ -4,6 +4,7 @@ import BestSellers from "@/components/home/BestSellers";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import IngredientSpotlight from "@/components/home/IngredientSpotlight";
 import Realface from "@/components/home/Realface";
+import ReviewSection from "@/components/home/ReviewSection";
 import RoutineBanner from "@/components/home/RoutineBanner";
 import Skin from "@/components/home/Skin";
 import TrustBar from "@/components/home/TrustBar";
@@ -20,7 +21,9 @@ export default function Home() {
       
       <BenefitsSection />
       <IngredientSpotlight />
+      <ReviewSection />
       <RoutineBanner />
+      
       <TrustBar />
     </div>
   );

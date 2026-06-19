@@ -33,25 +33,28 @@ export default async function FeaturedProducts() {
           </h2>
         </div>
 
-        <Link
-          href={`/shop/${product.slug}`}
-          className="group grid overflow-hidden rounded-sm border border-border bg-card md:grid-cols-2"
-        >
-          <div className="aspect-[4/3] bg-muted md:aspect-auto">
+        <div className="group grid overflow-hidden rounded-sm border border-border bg-card md:grid-cols-2">
+          <Link
+            href={`/shop/${product.slug}`}
+            className="aspect-[4/3] block bg-muted md:aspect-auto"
+            aria-label={product.name}
+          >
             <img
               src={primaryImage}
               alt={product.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
-          </div>
+          </Link>
 
           <div className="flex flex-col justify-center p-6 md:p-10">
             <span className="mb-2 text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
               {product.category.name}
             </span>
-            <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
-              {product.name}
-            </h3>
+            <Link href={`/shop/${product.slug}`}>
+              <h3 className="mb-2 text-2xl font-bold text-foreground md:text-3xl hover:underline">
+                {product.name}
+              </h3>
+            </Link>
             {product.shortDescription && (
               <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
                 {product.shortDescription}
@@ -76,7 +79,7 @@ export default async function FeaturedProducts() {
               <ArrowRight className="size-4" />
             </Button>
           </div>
-        </Link>
+        </div>
 
        
       </div>
