@@ -85,12 +85,38 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate order placement — replace with actual API call
-    await new Promise((r) => setTimeout(r, 1500));
+    const addressParts = [shippingAddress, selectedUpazila, selectedDistrict, selectedDivision].filter(Boolean);
+    const fullAddress = addressParts.join(", ");
 
-    clearLines();
-    clearCard();
-    router.push("/checkout/success");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/order/guest`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: lines.map((l) => ({ productId: l.productId, quantity: l.quantity })),
+            customerName: shippingName,
+            customerPhone: shippingPhone,
+            customerAddress: fullAddress,
+            deliveryZone,
+            notes: notes || undefined,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message ?? "Order failed. Please try again.");
+      }
+
+      clearLines();
+      clearCard();
+      router.push("/checkout/success");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Order failed. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   function formatCardNumber(value: string) {
