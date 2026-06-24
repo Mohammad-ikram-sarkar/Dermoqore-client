@@ -160,7 +160,7 @@ export default function CampaignPageClient({ campaign }: Props) {
                   {campaign.offerBadge}
                 </span>
               )}
-              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight md:text-5xl">
+              <h1 className="text-4xl font-extralight leading-[1.1] tracking-tight md:text-5xl">
                 {campaign.title}
               </h1>
               {campaign.subtitle && (
@@ -181,7 +181,7 @@ export default function CampaignPageClient({ campaign }: Props) {
 
               {/* Pricing */}
               <div className="flex flex-wrap items-baseline gap-3">
-                <span className="text-5xl font-extrabold text-foreground">
+                <span className="text-5xl font-bold text-foreground">
                   {formatPrice(campaignPrice)}
                 </span>
                 {comparePrice && (
@@ -199,7 +199,7 @@ export default function CampaignPageClient({ campaign }: Props) {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={scrollToForm}
-                  className="flex items-center justify-center gap-2 rounded-[10px] bg-foreground px-8 py-2 text-base font-bold text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
+                  className="flex items-center justify-center gap-2 rounded-[10px] bg-foreground px-8 py-2 text-base font-sans text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
                 >
                   <ShoppingCart className="size-5" />
                   {ctaText}
