@@ -13,7 +13,7 @@ const navLinks = [
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-6 md:px-10">
+      <div className="mx-auto flex h-[80px] max-w-[1400px] items-center justify-between px-6 md:px-10">
         {/* ── Logo ── */}
         <Link href="/" className="flex flex-col gap-0.5 no-underline">
           <span className="text-[22px] font-black tracking-[0.06em] leading-none text-foreground uppercase">

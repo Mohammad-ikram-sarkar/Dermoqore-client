@@ -41,7 +41,7 @@ export default function NavbarClient({
   return (
     <>
       {/* ── Desktop nav ── */}
-      <nav className="hidden lg:flex items-center gap-7">
+      <nav className="hidden lg:flex items-center gap-8">
         {navLinks.map(({ label, href }) => {
           const isActive = href === "/" ? pathname === href : pathname?.startsWith(href);
           
@@ -50,7 +50,7 @@ export default function NavbarClient({
               key={href}
               href={href}
               className={cn(
-                "relative text-[11px] font-medium tracking-[0.13em] uppercase transition-all duration-300",
+                "relative text-[12px] font-medium tracking-[0.13em] uppercase transition-all duration-300",
                 "after:absolute after:-bottom-1 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:bg-[#D46B5A] after:transition-all after:duration-300 hover:after:w-full",
                 isActive
                   ? "text-[#D46B5A] after:w-full"
@@ -69,32 +69,32 @@ export default function NavbarClient({
         <Button
           variant="ghost"
           size="icon"
-          className="hidden h-9 w-9 lg:flex"
+          className="hidden h-12 w-12 lg:flex"
           aria-label="Search"
         >
-          <Search className="h-[18px] w-[18px]" />
+          <Search className="size-5" />
         </Button>
 
         {/* Account — hidden on mobile, visible on lg+ */}
         <Button
           variant="ghost"
           size="icon"
-          className="hidden h-9 w-9 lg:flex"
+          className="hidden h-12 w-12 lg:flex"
           aria-label="Account"
           render={<Link href="/account" />}
         >
-          <AccountIcon className="h-5 w-5" />
+          <AccountIcon className="size-5" />
         </Button>
 
         {/* Cart */}
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9"
+          className="relative h-12 w-12"
           aria-label={`Cart (${cartCount})`}
           render={<Link href="/cart" />}
         >
-          <ShoppingBag className="h-[18px] w-[18px]" />
+          <ShoppingBag className="size-5" />
           {cartCount > 0 && (
             <Badge className="absolute -top-1 -right-1 flex h-4 w-4 items-center p-0 text-[9px] font-bold rounded-full bg-foreground text-background border-0 justify-center">
               {cartCount}
@@ -114,7 +114,7 @@ export default function NavbarClient({
               />
             }
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="size-5" />
           </SheetTrigger>
 
           <SheetContent side="right" className="w-[280px] px-0 pt-0">
@@ -133,7 +133,7 @@ export default function NavbarClient({
                   <Button variant="ghost" size="icon" className="h-8 w-8" />
                 }
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </SheetClose>
             </div>
 
@@ -167,7 +167,7 @@ export default function NavbarClient({
                   className="h-9 w-9"
                   aria-label="Search"
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="size-4" />
                 </Button>
                 <Button
                   variant="outline"
@@ -176,7 +176,7 @@ export default function NavbarClient({
                   aria-label="Account"
                   render={<Link href="/account" />}
                 >
-                  <AccountIcon className="h-5 w-5" />
+                  <AccountIcon className="size-5" />
                 </Button>
                 <Button
                   variant="outline"
@@ -184,7 +184,7 @@ export default function NavbarClient({
                   className="relative h-9 w-9"
                   render={<Link href="/cart" aria-label="Cart" />}
                 >
-                  <ShoppingBag className="h-4 w-4" />
+                  <ShoppingBag className="size-4" />
                   {cartCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 flex h-4 w-4 items-center p-0 text-[9px] font-bold rounded-full bg-foreground text-background border-0 justify-center">
                       {cartCount}
