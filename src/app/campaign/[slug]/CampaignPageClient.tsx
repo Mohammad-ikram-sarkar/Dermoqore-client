@@ -380,7 +380,7 @@ export default function CampaignPageClient({ campaign }: Props) {
       {campaign.included && campaign.included.length > 0 && (
         <section className="py-14">
           <div className="mx-auto max-w-7xl px-4">
-            <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">What's Included</h2>
+            <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">What&apos;s Included</h2>
             <p className="mb-8 text-center text-sm text-muted-foreground">Everything you get in this pack</p>
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <ul className="space-y-3">
@@ -488,7 +488,7 @@ export default function CampaignPageClient({ campaign }: Props) {
             {campaign.formTitle ?? "Order Now"}
           </h2>
           <p className="mb-8 text-center text-sm text-muted-foreground">
-            Fill out the form and we'll get back to you
+            Fill out the form and we&apos;ll get back to you
           </p>
           <CampaignOrderForm campaign={campaign} campaignPrice={campaignPrice} ctaText={ctaText} />
         </div>
