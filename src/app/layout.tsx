@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import { Suspense } from "react";
-import { headers } from "next/headers";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import { FooterServer } from "@/components/footer/FooterServer";
+import ShellWrapper from "@/components/ShellWrapper";
 
 const notoSans = Noto_Sans({subsets:['latin'],variable:'--font-sans'});
 
@@ -52,29 +52,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const h = await headers();
-  const pathname = h.get("x-pathname") ?? "";
-  const isCampaign = pathname.startsWith("/campaign");
-
   return (
     <html
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", notoSans.variable)}
     >
       <body className="min-h-full flex flex-col">
-        {!isCampaign && (
-          <Suspense fallback={null}>
-            <AnnouncementBar />
-          </Suspense>
-        )}
-        {!isCampaign && <Navbar />}
-        {children}
-        {!isCampaign && <FooterServer />}
+        <ShellWrapper
+          announcement={
+            <Suspense fallback={null}>
+              <AnnouncementBar />
+            </Suspense>
+          }
+          navbar={<Navbar />}
+          footer={<FooterServer />}
+        >
+          {children}
+        </ShellWrapper>
       </body>
     </html>
   );
