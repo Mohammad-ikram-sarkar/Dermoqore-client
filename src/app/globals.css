@@ -45,6 +45,18 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-accordion-down: accordion-down 0.25s ease-out;
+  --animate-accordion-up: accordion-up 0.25s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; opacity: 0; }
+    to { height: var(--accordion-panel-height); opacity: 1; }
+  }
+  @keyframes accordion-up {
+    from { height: var(--accordion-panel-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
+  }
 }
 
 :root {

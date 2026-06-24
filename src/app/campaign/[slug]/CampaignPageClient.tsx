@@ -2,9 +2,35 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { CheckCircle2, Phone, ShoppingCart, Star, ChevronDown, Loader2, CheckCheck, ArrowRight } from "lucide-react";
+import {
+  CheckCircle2,
+  Phone,
+  ShoppingCart,
+  Star,
+  ChevronDown,
+  Loader2,
+  CheckCheck,
+  ArrowRight,
+  Leaf,
+  Droplets,
+  ShieldCheck,
+  Sparkles,
+  Heart,
+  Sun,
+  Flower2,
+  HelpCircle,
+  type LucideIcon,
+} from "lucide-react";
 import type { Campaign } from "@/service/campaign.service";
 import { CampaignService } from "@/service/campaign.service";
+import Features from "@/components/campaign/Features";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import IngredientsSection from "@/components/campaign/IngredientsSection";
 
 function getYouTubeId(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
@@ -14,6 +40,44 @@ function getYouTubeId(url: string) {
 function formatPrice(price: number) {
   return `৳${price.toLocaleString("en-BD")}`;
 }
+
+/**
+ * Split a why-section bullet into a FAQ question + answer.
+ * Supports three conventions admins may type:
+ *   "Q: How long? A: 2 weeks"   →  { question, answer }
+ *   "How long?: 2 weeks"         →  { question, answer }
+ *   "Just a statement"           →  { question, answer: null }
+ */
+function splitFaqItem(raw: string): { question: string; answer: string | null } {
+  const text = raw.trim();
+
+  // "Q: ... A: ..." style
+  const qaMatch = text.match(/^Q[:.]?\s*(.+?)\s*A[:.]?\s*(.+)$/i);
+  if (qaMatch) {
+    return { question: qaMatch[1].trim(), answer: qaMatch[2].trim() };
+  }
+
+  // "Question?: answer" style (ends with ? or :)
+  const colon = text.split(/(?<=[?:])\s+/);
+  if (colon.length >= 2) {
+    return { question: colon[0].trim(), answer: colon.slice(1).join(" ").trim() };
+  }
+
+  // No answer — use the text itself as the question heading
+  return { question: text, answer: null };
+}
+
+/* Icon + color palette used by the Key Benefits cards */
+const BENEFIT_ICONS: LucideIcon[] = [Leaf, Droplets, ShieldCheck, Sparkles, Heart, Sun, Flower2];
+const BENEFIT_COLORS = [
+  { bg: "bg-emerald-100", text: "text-emerald-600" },
+  { bg: "bg-sky-100", text: "text-sky-600" },
+  { bg: "bg-violet-100", text: "text-violet-600" },
+  { bg: "bg-amber-100", text: "text-amber-600" },
+  { bg: "bg-rose-100", text: "text-rose-600" },
+  { bg: "bg-orange-100", text: "text-orange-600" },
+  { bg: "bg-teal-100", text: "text-teal-600" },
+];
 
 interface Props {
   campaign: Campaign;
@@ -41,9 +105,13 @@ export default function CampaignPageClient({ campaign }: Props) {
     campaign.product.images.find((i) => i.isPrimary)?.url ??
     campaign.product.images[0]?.url;
 
-  const ctaText = campaign.ctaText ?? "অর্ডার করুন";
+  const ctaText = campaign.ctaText ?? "Order Now";
   const phone = campaign.phoneNumber;
   const videoId = campaign.videoUrl ? getYouTubeId(campaign.videoUrl) : null;
+
+  // capture narrowed, non-empty optional arrays once (so callbacks keep the type)
+  const whySections = campaign.whySections?.length ? campaign.whySections : null;
+  const benefits = campaign.benefits?.length ? campaign.benefits : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -60,7 +128,7 @@ export default function CampaignPageClient({ campaign }: Props) {
             {phone && (
               <a
                 href={`tel:${phone}`}
-                className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+                className="flex items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
               >
                 <Phone className="size-3" />
                 {phone}
@@ -68,7 +136,7 @@ export default function CampaignPageClient({ campaign }: Props) {
             )}
             <button
               onClick={scrollToForm}
-              className="rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-foreground/90 transition-colors"
+              className="rounded-[5px] bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-foreground/90 transition-colors"
             >
               {ctaText}
             </button>
@@ -77,73 +145,69 @@ export default function CampaignPageClient({ campaign }: Props) {
       </header>
 
       {/* ── Hero section ───────────────────────────────────────────────────── */}
-      <section className="bg-background py-10 md:py-16">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="grid gap-8 md:grid-cols-2 md:items-center">
-            {/* Left — image */}
-            <div className="flex justify-center">
-              {primaryImage ? (
-                <img
-                  src={primaryImage}
-                  alt={campaign.title}
-                  className="max-h-[420px] w-full max-w-sm rounded-2xl object-cover shadow-xl"
-                />
-              ) : (
-                <div className="flex h-80 w-full max-w-sm items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                  No image
-                </div>
-              )}
-            </div>
+      <section className="relative overflow-hidden ">
+        {/* decorative blurred blobs */}
+        <div className="pointer-events-none absolute -left-24 -top-24 size-72 \ blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-0 size-80 rounded-full blur-3xl" />
 
-            {/* Right — info */}
-            <div className="space-y-5">
+        <div className="relative mx-auto max-w-6xl px-4 py-12 md:py-20">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            {/* Left — text */}
+            <div className="space-y-6 md:order-1 order-2">
               {campaign.offerBadge && (
-                <span className="inline-block rounded-full bg-destructive/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-destructive">
+                <span className="inline-flex items-center gap-1.5 rounded-[5px] bg-emerald-500 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow">
+                
                   {campaign.offerBadge}
                 </span>
               )}
-              <h1 className="text-3xl font-bold leading-tight md:text-4xl">{campaign.title}</h1>
+              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight md:text-5xl">
+                {campaign.title}
+              </h1>
               {campaign.subtitle && (
-                <p className="text-base text-muted-foreground">{campaign.subtitle}</p>
+                <p className="max-w-md text-lg text-muted-foreground">{campaign.subtitle}</p>
               )}
 
+              {/* Star rating */}
+              {/* <div className="flex items-center gap-2">
+                <div className="flex">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  4.9 (2,500+ happy customers)
+                </span>
+              </div> */}
+
               {/* Pricing */}
-              <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-extrabold text-foreground">{formatPrice(campaignPrice)}</span>
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="text-5xl font-extrabold text-foreground">
+                  {formatPrice(campaignPrice)}
+                </span>
                 {comparePrice && (
                   <>
-                    <span className="text-lg text-muted-foreground line-through">{formatPrice(comparePrice)}</span>
-                    <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-sm font-bold text-emerald-700">
-                      {discount}% ছাড়
+                    <span className="text-xl text-muted-foreground line-through">
+                      {formatPrice(comparePrice)}
+                    </span>
+                    <span className="rounded-[5px] bg-emerald-500 px-3 py-1 text-sm font-bold text-white">
+                      {discount}% OFF
                     </span>
                   </>
                 )}
               </div>
 
-              {/* Benefits list */}
-              {campaign.benefits && campaign.benefits.length > 0 && (
-                <ul className="space-y-2">
-                  {campaign.benefits.map((b, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={scrollToForm}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3.5 text-sm font-bold text-background shadow-lg hover:bg-foreground/90 transition-colors"
+                  className="flex items-center justify-center gap-2 rounded-[10px] bg-foreground px-8 py-2 text-base font-bold text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
                 >
-                  <ShoppingCart className="size-4" />
+                  <ShoppingCart className="size-5" />
                   {ctaText}
                 </button>
                 {phone && (
                   <a
                     href={`tel:${phone}`}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-3.5 text-sm font-semibold hover:bg-muted transition-colors"
+                    className="flex items-center justify-center gap-2 rounded-[10px] border-2 border-foreground/15 bg-background/60 px-6 py-2 text-sm font-medium backdrop-blur transition-colors hover:bg-muted"
                   >
                     <Phone className="size-4" />
                     {phone}
@@ -151,9 +215,46 @@ export default function CampaignPageClient({ campaign }: Props) {
                 )}
               </div>
             </div>
+
+            {/* Right — image */}
+            <div className="relative md:order-2 order-1">
+              <div className="relative mx-auto flex max-w-md justify-center">
+                {/* glow behind product */}
+                <div className="absolute inset-0 m-auto size-72 rounded-full blur-2xl" />
+                {primaryImage ? (
+                  <img
+                    src={primaryImage}
+                    alt={campaign.title}
+                    className="relative max-h-[500px]   w-full rounded-[10px] object-cover shadow-2xl"
+                  />
+                ) : (
+                  <div className="relative flex h-80 w-full items-center justify-center rounded-3xl bg-muted text-muted-foreground">
+                    No image
+                  </div>
+                )}
+
+                {/* floating discount badge */}
+                {/* {discount > 0 && (
+                  <div className="absolute -right-3 -top-3 flex size-20 flex-col items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg md:-right-4 md:-top-4">
+                    <span className="text-lg font-extrabold leading-none">{discount}%</span>
+                    <span className="text-[10px] font-bold uppercase">OFF</span>
+                    <span className="text-[9px] font-medium opacity-80">Today</span>
+                  </div>
+                )} */}
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* ── Key Benefits section ──────────────────────────────────────────── */}
+         
+      {campaign.benefits && campaign.benefits.length > 0 && (
+        <section className="border-y border-border bg-background py-14">
+          <Features/>
+          
+        </section>
+      )}
 
       {/* ── Hero image gallery (additional images) ─────────────────────────── */}
       {campaign.heroImages.length > 1 && (
@@ -175,12 +276,15 @@ export default function CampaignPageClient({ campaign }: Props) {
 
       {/* ── Video section ──────────────────────────────────────────────────── */}
       {videoId && (
-        <section className="py-12">
-          <div className="mx-auto max-w-3xl px-4 text-center">
+        <section className="py-14">
+          <div className="mx-auto max-w-7xl px-4 text-center">
             {campaign.videoTitle && (
-              <h2 className="mb-6 text-2xl font-bold">{campaign.videoTitle}</h2>
+              <h2 className="mb-2 text-3xl font-bold tracking-tight">{campaign.videoTitle}</h2>
             )}
-            <div className="overflow-hidden rounded-2xl shadow-xl">
+            <p className={campaign.videoTitle ? "mb-8 text-sm text-muted-foreground" : "mb-8 hidden"}>
+              See it in action
+            </p>
+            <div className="overflow-hidden rounded-[10px] shadow-xl ring-1 ring-border">
               <div className="relative aspect-video w-full">
                 <iframe
                   src={`https://www.youtube.com/embed/${videoId}`}
@@ -194,7 +298,7 @@ export default function CampaignPageClient({ campaign }: Props) {
             <div className="mt-6">
               <button
                 onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-xl bg-foreground px-8 py-3.5 text-sm font-bold text-background hover:bg-foreground/90 transition-colors"
+                className="inline-flex items-center gap-2 rounded-[5px] bg-foreground px-8 py-2 text-sm font-bold text-background shadow-lg transition-all hover:scale-[1.02] hover:bg-foreground/90"
               >
                 {ctaText} <ArrowRight className="size-4" />
               </button>
@@ -203,32 +307,67 @@ export default function CampaignPageClient({ campaign }: Props) {
         </section>
       )}
 
-      {/* ── Why sections ───────────────────────────────────────────────────── */}
-      {campaign.whySections && campaign.whySections.length > 0 && (
-        <section className="bg-muted/30 py-12">
-          <div className="mx-auto max-w-6xl px-4">
-            {campaign.whySections.map((section, si) => (
-              <div key={si} className="mb-10 last:mb-0">
-                {section.heading && (
-                  <h2 className="mb-6 text-center text-2xl font-bold">{section.heading}</h2>
-                )}
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {section.items.filter(Boolean).map((item, ii) => (
-                    <div
-                      key={ii}
-                      className="flex items-start gap-3 rounded-xl border border-border bg-background p-4"
-                    >
-                      <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" />
-                      <span className="text-sm leading-relaxed">{item}</span>
-                    </div>
-                  ))}
-                </div>
+      {/* ── Why sections (FAQ accordion) ───────────────────────────────────── */}
+      {whySections && (
+        <section className="bg-muted/30 py-14">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-10 text-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-foreground/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-foreground">
+                <HelpCircle className="size-3.5" />
+                FAQ
               </div>
-            ))}
+              <h2 className="text-3xl font-bold tracking-tight">
+                {whySections.length > 1
+                  ? "Questions & Answers"
+                  : whySections[0]?.heading ?? "Frequently Asked Questions"}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Everything you need to know before you order
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              {whySections.map((section, si) => {
+                const items = section.items.filter(Boolean);
+                if (items.length === 0) return null;
+                return (
+                  <div key={si} className="rounded-[10px] border border-border bg-card px-5 shadow-sm">
+                    {whySections.length > 1 && section.heading && (
+                      <h3 className="border-b border-border py-4 text-sm font-bold uppercase tracking-wide text-foreground">
+                        {section.heading}
+                      </h3>
+                    )}
+                    <Accordion multiple defaultValue={["why-0-0"]}>
+                      {items.map((item, ii) => {
+                        const { question, answer } = splitFaqItem(item);
+                        return (
+                          <AccordionItem key={ii} value={`why-${si}-${ii}`}>
+                            <AccordionTrigger className="items-center py-5 text-sm font-semibold text-foreground hover:no-underline">
+                              <span className="flex items-center gap-3">
+                                <span className="flex size-6 shrink-0 items-center justify-center rounded-[10px]  text-[11px] font-bold ">
+                                  {ii + 1}
+                                </span>
+                                {question}
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <p className="pl-9 text-sm leading-relaxed text-muted-foreground">
+                                {answer ?? item}
+                              </p>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      })}
+                    </Accordion>
+                  </div>
+                );
+              })}
+            </div>
+
             <div className="mt-8 text-center">
               <button
                 onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-xl bg-foreground px-8 py-3.5 text-sm font-bold text-background hover:bg-foreground/90 transition-colors"
+                className="inline-flex items-center gap-2 rounded-[5px] bg-foreground px-8 py-2 text-sm font-bold text-background shadow-lg transition-all hover:scale-[1.02] hover:bg-foreground/90"
               >
                 {ctaText} <ArrowRight className="size-4" />
               </button>
@@ -239,10 +378,11 @@ export default function CampaignPageClient({ campaign }: Props) {
 
       {/* ── What's included ────────────────────────────────────────────────── */}
       {campaign.included && campaign.included.length > 0 && (
-        <section className="py-12">
-          <div className="mx-auto max-w-3xl px-4">
-            <h2 className="mb-6 text-center text-2xl font-bold">এই প্যাকেজে যা পাচ্ছেন</h2>
-            <div className="rounded-2xl border border-border bg-card p-6">
+        <section className="py-14">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">What's Included</h2>
+            <p className="mb-8 text-center text-sm text-muted-foreground">Everything you get in this pack</p>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <ul className="space-y-3">
                 {campaign.included.filter(Boolean).map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
@@ -257,11 +397,11 @@ export default function CampaignPageClient({ campaign }: Props) {
       )}
 
       {/* ── Phone bar ──────────────────────────────────────────────────────── */}
-      {phone && (
+      {/* {phone && (
         <section className="bg-foreground py-6">
           <div className="mx-auto max-w-6xl px-4 text-center">
             <p className="mb-2 text-sm font-medium text-background/80">
-              যেকোনো সমস্যায় কল করুন — ২৪/৭ সাপোর্ট
+              Call us 24/7 for any query
             </p>
             <a
               href={`tel:${phone}`}
@@ -272,38 +412,19 @@ export default function CampaignPageClient({ campaign }: Props) {
             </a>
           </div>
         </section>
-      )}
+      )} */}
 
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
       {campaign.testimonials && campaign.testimonials.length > 0 && (
-        <section className="py-12">
-          <div className="mx-auto max-w-6xl px-4">
-            <h2 className="mb-8 text-center text-2xl font-bold">আমাদের গ্রাহকদের অভিজ্ঞতা</h2>
-            <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
-              {campaign.testimonials.map((t, i) => (
-                <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-                  <div className="mb-3 flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, si) => (
-                      <Star key={si} className="size-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="mb-4 text-sm leading-relaxed text-muted-foreground">&ldquo;{t.text}&rdquo;</p>
-                  <div>
-                    <p className="text-sm font-semibold">{t.name}</p>
-                    {t.location && <p className="text-xs text-muted-foreground">{t.location}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <TestimonialsSection testimonials={campaign.testimonials} />
       )}
-
+ 
       {/* ── Offer strip ────────────────────────────────────────────────────── */}
-      <section className="bg-muted/40 py-10">
+      {/* <section className="bg-muted/40 py-14">
         <div className="mx-auto max-w-3xl px-4 text-center">
           {campaign.offerBadge && (
-            <span className="mb-3 inline-block rounded-full bg-destructive/10 px-4 py-1 text-xs font-bold uppercase tracking-widest text-destructive">
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-destructive px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow">
+              <Sparkles className="size-3.5" />
               {campaign.offerBadge}
             </span>
           )}
@@ -314,34 +435,60 @@ export default function CampaignPageClient({ campaign }: Props) {
             )}
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            + ডেলিভারি চার্জ: ঢাকায় ৳৬০ | ঢাকার বাইরে ৳১২০
+            + Delivery: ৳60 (Inside Dhaka) | ৳120 (Outside Dhaka)
           </p>
           <button
             onClick={scrollToForm}
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-foreground px-10 py-4 text-base font-bold text-background shadow-lg hover:bg-foreground/90 transition-colors"
+            className="mt-6 inline-flex items-center gap-2 rounded-[5px] bg-foreground px-10 py-2 text-base font-bold text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
           >
             <ShoppingCart className="size-5" />
             {ctaText}
           </button>
           {phone && (
             <p className="mt-4 text-sm text-muted-foreground">
-              অথবা কল করুন:{" "}
+              Or call:{" "}
               <a href={`tel:${phone}`} className="font-semibold text-foreground hover:underline">
                 {phone}
               </a>
             </p>
           )}
         </div>
-      </section>
+      </section> */}
+      <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-10 text-center">
+              <h2 className="text-3xl font-bold tracking-tight">Key Benefits</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Why customers love this product
+              </p>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {(campaign.benefits ?? []).map((b, i) => {
+                const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
+                const color = BENEFIT_COLORS[i % BENEFIT_COLORS.length];
+                return (
+                  <div
+                    key={i}
+                    className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+                  >
+                    <div className={`mb-4 flex size-12 items-center justify-center rounded-xl ${color.bg}`}>
+                      <Icon className={`size-6 ${color.text}`} />
+                    </div>
+                    <p className="text-sm font-medium leading-relaxed">{b}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+                  <IngredientsSection/>
 
       {/* ── Order form ─────────────────────────────────────────────────────── */}
-      <section ref={formRef} className="py-12" id="order-form">
-        <div className="mx-auto max-w-4xl px-4">
-          <h2 className="mb-2 text-center text-2xl font-bold">
-            {campaign.formTitle ?? "এখনই অর্ডার করুন"}
+      <section ref={formRef} className="py-14" id="order-form">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">
+            {campaign.formTitle ?? "Order Now"}
           </h2>
           <p className="mb-8 text-center text-sm text-muted-foreground">
-            নিচের ফর্মটি পূরণ করুন — আমরা আপনার সাথে যোগাযোগ করব
+            Fill out the form and we'll get back to you
           </p>
           <CampaignOrderForm campaign={campaign} campaignPrice={campaignPrice} ctaText={ctaText} />
         </div>
@@ -357,17 +504,85 @@ export default function CampaignPageClient({ campaign }: Props) {
             <span className="text-sm font-semibold">Dermoqore</span>
           </Link>
           <p className="text-xs text-muted-foreground">
-            বাংলাদেশে ডেলিভারি | ৭ দিনের রিটার্ন পলিসি | ১০০% অরিজিনাল পণ্য
+            Delivery across Bangladesh | 7-Day Return Policy | 100% Authentic Products
           </p>
           {phone && (
             <p className="mt-2 text-xs text-muted-foreground">
-              সাপোর্ট:{" "}
+              Support:{" "}
               <a href={`tel:${phone}`} className="font-medium text-foreground">{phone}</a>
             </p>
           )}
         </div>
       </footer>
     </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Testimonials Section                                                         */
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+const INITIAL_VISIBLE = 3;
+
+type Testimonial = NonNullable<Campaign["testimonials"]>[number];
+
+function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
+  const [showAll, setShowAll] = useState(false);
+  const hasMore = testimonials.length > INITIAL_VISIBLE;
+  const visible = showAll ? testimonials : testimonials.slice(0, INITIAL_VISIBLE);
+
+  return (
+    <section className="py-14">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">What Our Customers Say</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Real reviews from verified buyers</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3">
+          {visible.map((t, i) => (
+            <div
+              key={i}
+              className="rounded-[5px] border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="mb-3 flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, si) => (
+                  <Star key={si} className="size-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <p className="mb-4 text-sm leading-relaxed text-muted-foreground">&ldquo;{t.text}&rdquo;</p>
+              <div className="flex items-center gap-3 border-t border-border pt-3">
+                <div className="flex size-9 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
+                  {t.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">{t.name}</p>
+                  {t.location && <p className="text-xs text-muted-foreground">{t.location}</p>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {hasMore && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setShowAll((s) => !s)}
+              className="inline-flex items-center gap-2 rounded-[5px] border border-border bg-background px-6 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
+            >
+              {showAll ? (
+                <>Show Less</>
+              ) : (
+                <>
+                  Show All {testimonials.length} Reviews
+                  <ChevronDown className="size-4" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -416,7 +631,7 @@ function CampaignOrderForm({
       setOrderNumber(result?.orderNumber ?? null);
       setSuccess(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "অর্ডার ব্যর্থ হয়েছে। আবার চেষ্টা করুন।");
+      setError(e instanceof Error ? e.message : "Order failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -428,18 +643,18 @@ function CampaignOrderForm({
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
           <CheckCircle2 className="size-8 text-emerald-600" />
         </div>
-        <h3 className="mb-2 text-xl font-bold">অর্ডার সফলভাবে হয়েছে!</h3>
+        <h3 className="mb-2 text-xl font-bold">Order Placed Successfully!</h3>
         {orderNumber && (
           <p className="mb-2 text-sm text-muted-foreground">
-            অর্ডার নম্বর: <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
+            Order Number: <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
           </p>
         )}
         <p className="text-sm text-muted-foreground">
-          আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব। ধন্যবাদ!
+          We will contact you shortly. Thank you!
         </p>
         {campaign.phoneNumber && (
           <p className="mt-4 text-sm">
-            যোগাযোগ করুন:{" "}
+            Contact:{" "}
             <a href={`tel:${campaign.phoneNumber}`} className="font-semibold hover:underline">
               {campaign.phoneNumber}
             </a>
@@ -450,165 +665,195 @@ function CampaignOrderForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5">
-      {error && (
-        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      {/* Product summary */}
-      <div className="flex items-center gap-4 rounded-xl bg-muted/50 p-4">
-        {campaign.product.images[0]?.url && (
+    <div className="rounded-[10px] border border-border bg-card shadow-sm overflow-hidden">
+      {/* ── Top: product image + title + trust icons ── */}
+      <div className="flex flex-wrap items-center gap-4 border-b border-border bg-muted/30 px-6 py-4">
+        {(campaign.heroImages[0]?.url ?? campaign.product.images[0]?.url) && (
           <img
-            src={campaign.heroImages[0]?.url ?? campaign.product.images[0].url}
+            src={campaign.heroImages[0]?.url ?? campaign.product.images[0]!.url}
             alt={campaign.product.name}
-            className="size-16 rounded-lg object-cover"
+            className="size-16 rounded-xl object-cover shadow"
           />
         )}
-        <div>
-          <p className="font-semibold">{campaign.product.name}</p>
-          <p className="text-lg font-bold">{formatPrice(campaignPrice)}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-base leading-tight">{campaign.product.name}</p>
+          <p className="text-2xl font-extrabold mt-0.5">{formatPrice(campaignPrice)}</p>
+        </div>
+        {/* Trust strip */}
+        <div className="flex items-center gap-5 text-xs text-muted-foreground ml-auto">
+          <span className="flex flex-col items-center gap-1">
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            Nationwide
+          </span>
+          <span className="flex flex-col items-center gap-1">
+            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            Cash on Delivery
+          </span>
+          <span className="flex flex-col items-center gap-1">
+            <ShieldCheck className="size-5" />
+            7-Day Return
+          </span>
         </div>
       </div>
 
-      {/* Quantity */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          পরিমাণ
-        </label>
-        <div className="flex items-center gap-3">
+      {/* ── Main 2-column layout: form | summary ── */}
+      <div className="grid md:grid-cols-[1fr_280px]">
+
+        {/* ── Left: ORDER FORM ── */}
+        <form onSubmit={handleSubmit} className="space-y-4 p-6 border-r border-border">
+          <h3 className="text-base font-bold uppercase tracking-wider text-muted-foreground">Order Form</h3>
+
+          {error && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
+          {/* Name + Phone side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground">Your Name *</label>
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Full name"
+                className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground">Phone Number *</label>
+              <input
+                required
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="01XXXXXXXXX"
+                className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Address *</label>
+            <textarea
+              required
+              rows={2}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="House / Road / Area / District"
+              className="w-full rounded-[5px] border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Special Notes (Optional)</label>
+            <input
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Any special instructions"
+              className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+
+          {/* Quantity */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Quantity</label>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-lg font-bold hover:bg-muted transition-colors"
+              >
+                −
+              </button>
+              <span className="w-10 text-center text-base font-bold">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-lg font-bold hover:bg-muted transition-colors"
+              >
+                +
+              </button>
+              <span className="text-xs text-muted-foreground">× {formatPrice(campaignPrice)} = {formatPrice(subtotal)}</span>
+            </div>
+          </div>
+
+          {/* Delivery zone */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Delivery Zone</label>
+            <div className="flex flex-col gap-2">
+              {(["INSIDE_DHAKA", "OUTSIDE_DHAKA"] as const).map((z) => (
+                <label key={z} className="flex items-center gap-2.5 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="zone"
+                    checked={zone === z}
+                    onChange={() => setZone(z)}
+                    className="accent-foreground"
+                  />
+                  <span className="text-sm">
+                    {z === "INSIDE_DHAKA" ? "Delivery Inside Dhaka" : "Outside Dhaka"}
+                    <span className="ml-1 text-muted-foreground">(Fee: ৳{z === "INSIDE_DHAKA" ? "60" : "120"})</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <button
-            type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-xl font-bold hover:bg-muted transition-colors"
+            type="submit"
+            disabled={submitting}
+            className="flex w-full items-center justify-center gap-2 rounded-[5px]-500 py-3 text-base font-bold text-white bg-black shadow-lg transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 rounded-[5px]"
           >
-            −
+            {submitting ? (
+              <><Loader2 className="size-5 animate-spin" /> Please wait...</>
+            ) : (
+              <><ShoppingCart className="size-5" /> {ctaText}</>
+            )}
           </button>
-          <span className="w-12 text-center text-lg font-bold">{quantity}</span>
-          <button
-            type="button"
-            onClick={() => setQuantity((q) => q + 1)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-xl font-bold hover:bg-muted transition-colors"
-          >
-            +
-          </button>
-          <span className="ml-2 text-sm text-muted-foreground">× {formatPrice(campaignPrice)} = {formatPrice(subtotal)}</span>
+        </form>
+
+        {/* ── Right: ORDER SUMMARY ── */}
+        <div className="p-6 bg-muted/20 flex flex-col gap-4">
+          <h3 className="text-base font-bold uppercase tracking-wider text-center border-b border-border pb-3">
+            Order Summary
+          </h3>
+          <div className="space-y-3 text-sm flex-1">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Item Price ({quantity}pc)</span>
+              <span className="font-semibold">{formatPrice(subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Delivery Charge</span>
+              <span className="font-semibold">{formatPrice(shipping)}</span>
+            </div>
+            <div className="flex justify-between border-t border-border pt-3 text-base">
+              <span className="font-bold">Total</span>
+              <span className="font-extrabold text-lg">{formatPrice(total)}</span>
+            </div>
+          </div>
+
+          {/* Trust badges */}
+          <div className="mt-auto space-y-2 pt-4 border-t border-border">
+            {[
+              { icon: <CheckCheck className="size-4 text-emerald-600" />, text: "100% Authentic Products" },
+              { icon: <ShieldCheck className="size-4 text-emerald-600" />, text: "Secure Order Processing" },
+              { icon: <CheckCircle2 className="size-4 text-emerald-600" />, text: "Cash on Delivery Available" },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex items-center gap-2 text-xs text-muted-foreground">
+                {icon}
+                {text}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Name */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          আপনার নাম *
-        </label>
-        <input
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="পূর্ণ নাম লিখুন"
-          className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-        />
       </div>
-
-      {/* Phone */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          মোবাইল নম্বর *
-        </label>
-        <input
-          required
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="01XXXXXXXXX"
-          className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Address */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          ঠিকানা *
-        </label>
-        <textarea
-          required
-          rows={3}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder="বাড়ি / রোড / এলাকা / জেলা"
-          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
-        />
-      </div>
-
-      {/* Delivery zone */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          ডেলিভারি
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          {(["INSIDE_DHAKA", "OUTSIDE_DHAKA"] as const).map((z) => (
-            <button
-              key={z}
-              type="button"
-              onClick={() => setZone(z)}
-              className={`flex flex-col rounded-xl border p-3 text-left transition-colors ${
-                zone === z
-                  ? "border-foreground bg-muted"
-                  : "border-border bg-background hover:bg-muted/50"
-              }`}
-            >
-              <span className="text-sm font-semibold">
-                {z === "INSIDE_DHAKA" ? "ঢাকার ভেতরে" : "ঢাকার বাইরে"}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                ডেলিভারি: ৳{z === "INSIDE_DHAKA" ? "৬০" : "১২০"}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          বিশেষ নোট (ঐচ্ছিক)
-        </label>
-        <input
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="কোনো বিশেষ নির্দেশনা থাকলে লিখুন"
-          className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Order summary */}
-      <div className="rounded-xl bg-muted/40 p-4 space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">পণ্যের মূল্য ({quantity}টি)</span>
-          <span className="font-semibold">{formatPrice(subtotal)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">ডেলিভারি চার্জ</span>
-          <span className="font-semibold">{formatPrice(shipping)}</span>
-        </div>
-        <div className="flex justify-between border-t border-border pt-2 text-base">
-          <span className="font-bold">মোট</span>
-          <span className="font-extrabold">{formatPrice(total)}</span>
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-foreground py-4 text-base font-bold text-background shadow-lg hover:bg-foreground/90 transition-colors disabled:opacity-60"
-      >
-        {submitting ? (
-          <><Loader2 className="size-5 animate-spin" /> অপেক্ষা করুন...</>
-        ) : (
-          <><ShoppingCart className="size-5" /> {ctaText}</>
-        )}
-      </button>
-    </form>
+    </div>
   );
 }
+
+
