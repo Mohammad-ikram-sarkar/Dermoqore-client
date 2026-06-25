@@ -4,243 +4,293 @@ import React from "react";
 import type { SkinConcern } from "@/service/campaign.service";
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/* Face SVG icons — each represents a different skin concern                   */
-/* All drawn at 64×64, line-art style matching the design in the screenshot   */
+/* Shared stroke props — thin line-art style, navy/dark-blue tint              */
 /* ─────────────────────────────────────────────────────────────────────────── */
+const S = {
+  fill: "none" as const,
+  stroke: "#2d3a8c",
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
 
-function FaceSvg({ keyword }: { keyword: string }) {
-  const s = {
-    fill: "none" as const,
-    stroke: "var(--cpt, #374151)",
-    strokeWidth: "1.35",
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-
-  /* ── shared face base ── */
-  const FaceBase = () => (
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Shared face base — same proportions across all icons                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function FaceBase() {
+  return (
     <>
-      {/* head */}
-      <ellipse cx="32" cy="28" rx="16" ry="18" {...s} />
-      {/* neck */}
-      <path d="M26 44 C26 48 28 50 32 51 C36 50 38 48 38 44" {...s} />
-      {/* hair top */}
-      <path d="M16.5 24 C16 18 20 13 26 12 C28 11.5 30 11 32 11 C34 11 36 11.5 38 12 C44 13 48 18 47.5 24" {...s} />
-      {/* left ear */}
-      <path d="M16 26 C13.5 26 12 27.5 12 29 C12 30.5 13.5 32 16 32" {...s} />
-      {/* right ear */}
-      <path d="M48 26 C50.5 26 52 27.5 52 29 C52 30.5 50.5 32 48 32" {...s} />
-      {/* left eye */}
-      <ellipse cx="25" cy="27" rx="3" ry="2" {...s} />
-      <circle cx="25.5" cy="27" r="0.8" fill="var(--cpt, #374151)" stroke="none" />
-      {/* right eye */}
-      <ellipse cx="39" cy="27" rx="3" ry="2" {...s} />
-      <circle cx="39.5" cy="27" r="0.8" fill="var(--cpt, #374151)" stroke="none" />
-      {/* nose */}
-      <path d="M32 27 L30.5 33 Q32 34.5 33.5 33 L32 27" {...s} strokeWidth="1.1" />
-      {/* mouth */}
-      <path d="M27 37 Q32 40 37 37" {...s} strokeWidth="1.2" />
+      {/* ── Head / face outline ── */}
+      <ellipse cx="50" cy="48" rx="22" ry="26" {...S} strokeWidth="1.6" />
+
+      {/* ── Hair ── */}
+      <path
+        d="M28 44 C27 34 30 22 36 18 C40 15 45 14 50 14 C55 14 60 15 64 18 C70 22 73 34 72 44"
+        {...S} strokeWidth="1.5"
+      />
+      {/* hair detail lines on top */}
+      <path d="M38 18 C38 14 42 12 50 12 C58 12 62 14 62 18" {...S} strokeWidth="1.2" />
+
+      {/* ── Left ear ── */}
+      <path d="M28 46 C25 46 23 48 23 50 C23 52 25 54 28 54" {...S} strokeWidth="1.4" />
+
+      {/* ── Right ear ── */}
+      <path d="M72 46 C75 46 77 48 77 50 C77 52 75 54 72 54" {...S} strokeWidth="1.4" />
+
+      {/* ── Left eyebrow ── */}
+      <path d="M37 37 Q41 34 45 36" {...S} strokeWidth="1.3" />
+
+      {/* ── Right eyebrow ── */}
+      <path d="M55 36 Q59 34 63 37" {...S} strokeWidth="1.3" />
+
+      {/* ── Left eye ── */}
+      <ellipse cx="41" cy="42" rx="4" ry="2.8" {...S} strokeWidth="1.3" />
+      <circle cx="41.5" cy="42" r="1.2" fill="#2d3a8c" stroke="none" />
+
+      {/* ── Right eye ── */}
+      <ellipse cx="59" cy="42" rx="4" ry="2.8" {...S} strokeWidth="1.3" />
+      <circle cx="59.5" cy="42" r="1.2" fill="#2d3a8c" stroke="none" />
+
+      {/* ── Nose ── */}
+      <path d="M50 43 L48 52 Q50 54 52 52 L50 43" {...S} strokeWidth="1.1" />
+
+      {/* ── Mouth ── */}
+      <path d="M43 58 Q50 62 57 58" {...S} strokeWidth="1.3" />
+
+      {/* ── Neck ── */}
+      <path d="M44 72 C44 76 46 78 50 79 C54 78 56 76 56 72" {...S} strokeWidth="1.4" />
     </>
   );
+}
 
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon 1 — Dark spots / রণের পুরানো দাগ                                      */
+/* Hand touching cheek + scattered spots                                       */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconDarkSpots() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      {/* spots on cheeks and forehead */}
+      <circle cx="34" cy="50" r="2" fill="#2d3a8c" opacity={0.4} />
+      <circle cx="36" cy="56" r="1.5" fill="#2d3a8c" opacity={0.35} />
+      <circle cx="31" cy="54" r="1.3" fill="#2d3a8c" opacity={0.3} />
+      <circle cx="65" cy="52" r="1.8" fill="#2d3a8c" opacity={0.38} />
+      <circle cx="67" cy="58" r="1.2" fill="#2d3a8c" opacity={0.3} />
+      <circle cx="50" cy="28" r="1.5" fill="#2d3a8c" opacity={0.28} />
+      {/* hand touching left cheek */}
+      <path
+        d="M18 62 C16 58 16 54 18 52 C20 50 22 51 23 53 L24 56 C24 56 25 52 27 51 C29 50 31 52 30 55 L30 58 C30 58 32 55 34 55 C36 55 37 57 36 60 L34 65 C33 68 30 70 27 70 L22 70 Z"
+        {...S} strokeWidth="1.2"
+      />
+      {/* finger details */}
+      <line x1="24" y1="56" x2="23" y2="53" {...S} strokeWidth="0.9" />
+      <line x1="30" y1="58" x2="30" y2="55" {...S} strokeWidth="0.9" />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon 2 — Melasma / কালো ছোপ (হাইপারপিগমেন্টেশন)                           */
+/* Large dark blotchy patches on both cheeks + small teardrop/drip             */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconMelasma() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      {/* large blotch — left cheek */}
+      <ellipse cx="34" cy="53" rx="7" ry="5" fill="#2d3a8c" opacity={0.18} stroke="none" />
+      <ellipse cx="33" cy="51" rx="5" ry="3" fill="#2d3a8c" opacity={0.14} stroke="none" />
+      {/* large blotch — right cheek */}
+      <ellipse cx="66" cy="53" rx="7" ry="5" fill="#2d3a8c" opacity={0.18} stroke="none" />
+      <ellipse cx="67" cy="51" rx="5" ry="3" fill="#2d3a8c" opacity={0.14} stroke="none" />
+      {/* upper lip shadow */}
+      <path d="M45 57 Q50 59 55 57" stroke="#2d3a8c" strokeWidth="2" opacity={0.3} strokeLinecap="round" fill="none" />
+      {/* small drip/drop indicating pigment — left side */}
+      <path
+        d="M27 60 C27 60 25 64 25 66 C25 68 26 69 27 69 C28 69 29 68 29 66 C29 64 27 60 27 60Z"
+        {...S} strokeWidth="1.1" opacity={0.6}
+      />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon 3 — Uneven skin tone                                                   */
+/* X / cross marks on the skin indicating patchiness                          */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconUnevenTone() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      {/* X mark left cheek */}
+      <line x1="30" y1="48" x2="37" y2="55" stroke="#2d3a8c" strokeWidth="1.8" strokeLinecap="round" opacity={0.55} />
+      <line x1="37" y1="48" x2="30" y2="55" stroke="#2d3a8c" strokeWidth="1.8" strokeLinecap="round" opacity={0.55} />
+      {/* X mark right cheek */}
+      <line x1="63" y1="48" x2="70" y2="55" stroke="#2d3a8c" strokeWidth="1.8" strokeLinecap="round" opacity={0.55} />
+      <line x1="70" y1="48" x2="63" y2="55" stroke="#2d3a8c" strokeWidth="1.8" strokeLinecap="round" opacity={0.55} />
+      {/* small X on forehead */}
+      <line x1="46" y1="28" x2="50" y2="32" stroke="#2d3a8c" strokeWidth="1.4" strokeLinecap="round" opacity={0.4} />
+      <line x1="50" y1="28" x2="46" y2="32" stroke="#2d3a8c" strokeWidth="1.4" strokeLinecap="round" opacity={0.4} />
+      {/* uneven tone patches */}
+      <ellipse cx="33" cy="52" rx="5" ry="4" fill="#2d3a8c" opacity={0.1} stroke="none" />
+      <ellipse cx="67" cy="51" rx="5" ry="3.5" fill="#2d3a8c" opacity={0.15} stroke="none" />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon 4 — Sun spots / Pigmentation                                           */
+/* Small sun in corner + brown freckle dots across face                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconSunSpots() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      {/* small sun top-right corner */}
+      <circle cx="76" cy="16" r="6" stroke="#2d3a8c" strokeWidth="1.3" fill="none" opacity={0.7} />
+      <line x1="76" y1="7" x2="76" y2="4" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="76" y1="25" x2="76" y2="28" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="67" y1="16" x2="64" y2="16" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="85" y1="16" x2="88" y2="16" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="69.6" y1="9.6" x2="67.4" y2="7.4" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="82.4" y1="22.4" x2="84.6" y2="24.6" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="82.4" y1="9.6" x2="84.6" y2="7.4" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      <line x1="69.6" y1="22.4" x2="67.4" y2="24.6" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" opacity={0.7} />
+      {/* sun spots / freckles on face */}
+      <circle cx="33" cy="50" r="2.5" fill="#2d3a8c" opacity={0.38} stroke="none" />
+      <circle cx="36" cy="56" r="1.8" fill="#2d3a8c" opacity={0.32} stroke="none" />
+      <circle cx="67" cy="50" r="2.2" fill="#2d3a8c" opacity={0.38} stroke="none" />
+      <circle cx="65" cy="57" r="1.5" fill="#2d3a8c" opacity={0.3} stroke="none" />
+      <circle cx="44" cy="32" r="1.4" fill="#2d3a8c" opacity={0.28} stroke="none" />
+      <circle cx="56" cy="31" r="1.2" fill="#2d3a8c" opacity={0.25} stroke="none" />
+      <circle cx="50" cy="35" r="1.3" fill="#2d3a8c" opacity={0.22} stroke="none" />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon 5 — Post-acne / মেসকা, পড়ার পর মুখের দাগ                             */
+/* Healed acne marks — small scar indentations on cheeks                       */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconPostAcne() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      {/* scar / indentation marks on left cheek */}
+      <path d="M31 49 Q34 47 37 49" stroke="#2d3a8c" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity={0.5} />
+      <path d="M30 54 Q33 52 36 54" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.45} />
+      {/* scar marks on right cheek */}
+      <path d="M63 49 Q66 47 69 49" stroke="#2d3a8c" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity={0.5} />
+      <path d="M64 55 Q67 53 70 55" stroke="#2d3a8c" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.45} />
+      {/* small round healed spots */}
+      <circle cx="33" cy="59" r="1.8" stroke="#2d3a8c" strokeWidth="1.1" fill="none" opacity={0.45} />
+      <circle cx="67" cy="59" r="1.5" stroke="#2d3a8c" strokeWidth="1.1" fill="none" opacity={0.45} />
+      <circle cx="47" cy="33" r="1.3" stroke="#2d3a8c" strokeWidth="1" fill="none" opacity={0.35} />
+      {/* tiny mark dots */}
+      <circle cx="33" cy="59" r="0.7" fill="#2d3a8c" stroke="none" opacity={0.4} />
+      <circle cx="67" cy="59" r="0.7" fill="#2d3a8c" stroke="none" opacity={0.4} />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Additional icon variants                                                    */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function IconAcne() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      <circle cx="32" cy="50" r="3.5" stroke="#2d3a8c" strokeWidth="1.3" fill="none" opacity={0.6} />
+      <circle cx="32" cy="50" r="1.5" fill="#2d3a8c" stroke="none" opacity={0.45} />
+      <circle cx="68" cy="51" r="3" stroke="#2d3a8c" strokeWidth="1.3" fill="none" opacity={0.6} />
+      <circle cx="68" cy="51" r="1.3" fill="#2d3a8c" stroke="none" opacity={0.45} />
+      <circle cx="43" cy="36" r="2.5" stroke="#2d3a8c" strokeWidth="1.2" fill="none" opacity={0.5} />
+      <circle cx="57" cy="35" r="2" stroke="#2d3a8c" strokeWidth="1.2" fill="none" opacity={0.5} />
+      <circle cx="50" cy="60" r="2" stroke="#2d3a8c" strokeWidth="1.1" fill="none" opacity={0.4} />
+    </svg>
+  );
+}
+
+function IconWrinkles() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      <path d="M36 30 Q50 27 64 30" stroke="#2d3a8c" strokeWidth="1" fill="none" opacity={0.45} />
+      <path d="M38 34 Q50 31 62 34" stroke="#2d3a8c" strokeWidth="0.9" fill="none" opacity={0.35} />
+      <path d="M26 44 L22 42 M26 47 L21 47 M26 50 L22 52"
+        stroke="#2d3a8c" strokeWidth="1" strokeLinecap="round" fill="none" opacity={0.4} />
+      <path d="M74 44 L78 42 M74 47 L79 47 M74 50 L78 52"
+        stroke="#2d3a8c" strokeWidth="1" strokeLinecap="round" fill="none" opacity={0.4} />
+      <path d="M41 57 Q43 60 42 63" stroke="#2d3a8c" strokeWidth="1" fill="none" opacity={0.4} />
+      <path d="M59 57 Q57 60 58 63" stroke="#2d3a8c" strokeWidth="1" fill="none" opacity={0.4} />
+    </svg>
+  );
+}
+
+function IconDarkCircles() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      <path d="M36 46 Q41 51 46 46" stroke="#2d3a8c" strokeWidth="2" strokeLinecap="round" fill="none" opacity={0.55} />
+      <path d="M54 46 Q59 51 64 46" stroke="#2d3a8c" strokeWidth="2" strokeLinecap="round" fill="none" opacity={0.55} />
+      <ellipse cx="41" cy="46" rx="6" ry="2.5" fill="#2d3a8c" opacity={0.14} stroke="none" />
+      <ellipse cx="59" cy="46" rx="6" ry="2.5" fill="#2d3a8c" opacity={0.14} stroke="none" />
+    </svg>
+  );
+}
+
+function IconOilySkin() {
+  return (
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+      <FaceBase />
+      <ellipse cx="50" cy="30" rx="4" ry="2.5" fill="#2d3a8c" opacity={0.2} stroke="none" />
+      <path d="M46 28 L47 25" stroke="#2d3a8c" strokeWidth="1.3" strokeLinecap="round" fill="none" opacity={0.45} />
+      <path d="M50 27 L50 24" stroke="#2d3a8c" strokeWidth="1.3" strokeLinecap="round" fill="none" opacity={0.45} />
+      <path d="M54 28 L55 25" stroke="#2d3a8c" strokeWidth="1.3" strokeLinecap="round" fill="none" opacity={0.45} />
+      <path d="M30 52 C30 52 28 56 28 59 C28 62 30 63 30 63 C30 63 32 62 32 59 C32 56 30 52 30 52Z"
+        {...S} strokeWidth="1.1" opacity={0.5} />
+      <path d="M70 50 C70 50 68 54 68 57 C68 60 70 61 70 61 C70 61 72 60 72 57 C72 54 70 50 70 50Z"
+        {...S} strokeWidth="1.1" opacity={0.5} />
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon dispatcher                                                             */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function SkinConcernIcon({ keyword }: { keyword: string }) {
   switch (keyword) {
-    /* ── 1. Dark spots / old marks ── */
-    case "dark-spots":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* scattered dark spots on cheeks and forehead */}
-          <circle cx="21" cy="23" r="1.5" fill="var(--cpt, #374151)" opacity={0.45} stroke="none" />
-          <circle cx="43" cy="22" r="1.2" fill="var(--cpt, #374151)" opacity={0.45} stroke="none" />
-          <circle cx="19" cy="32" r="1.8" fill="var(--cpt, #374151)" opacity={0.45} stroke="none" />
-          <circle cx="44" cy="33" r="1.4" fill="var(--cpt, #374151)" opacity={0.45} stroke="none" />
-          <circle cx="32" cy="16" r="1.3" fill="var(--cpt, #374151)" opacity={0.4} stroke="none" />
-          <circle cx="27" cy="39" r="1.1" fill="var(--cpt, #374151)" opacity={0.35} stroke="none" />
-          <circle cx="38" cy="39" r="1.1" fill="var(--cpt, #374151)" opacity={0.35} stroke="none" />
-        </svg>
-      );
-
-    /* ── 2. Melasma / hyperpigmentation ── */
-    case "melasma":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* large blotchy patches on cheeks */}
-          <ellipse cx="21" cy="32" rx="5" ry="3.5" fill="var(--cpt, #374151)" opacity={0.18} stroke="none" />
-          <ellipse cx="43" cy="32" rx="5" ry="3.5" fill="var(--cpt, #374151)" opacity={0.18} stroke="none" />
-          {/* forehead patch */}
-          <ellipse cx="32" cy="18" rx="6" ry="2.5" fill="var(--cpt, #374151)" opacity={0.14} stroke="none" />
-          {/* upper lip shadow */}
-          <path d="M28 36 Q32 37.5 36 36" stroke="var(--cpt, #374151)" strokeWidth="2" opacity={0.25} strokeLinecap="round" fill="none" />
-        </svg>
-      );
-
-    /* ── 3. Uneven skin tone ── */
-    case "uneven-tone":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* cross / X marks indicating unevenness */}
-          <line x1="19" y1="30" x2="23" y2="34" stroke="var(--cpt, #374151)" strokeWidth="1.5" strokeLinecap="round" opacity={0.5} />
-          <line x1="23" y1="30" x2="19" y2="34" stroke="var(--cpt, #374151)" strokeWidth="1.5" strokeLinecap="round" opacity={0.5} />
-          <line x1="41" y1="30" x2="45" y2="34" stroke="var(--cpt, #374151)" strokeWidth="1.5" strokeLinecap="round" opacity={0.5} />
-          <line x1="45" y1="30" x2="41" y2="34" stroke="var(--cpt, #374151)" strokeWidth="1.5" strokeLinecap="round" opacity={0.5} />
-          {/* uneven tone gradient patches */}
-          <ellipse cx="20" cy="32" rx="4" ry="3" fill="var(--cpt, #374151)" opacity={0.12} stroke="none" />
-          <ellipse cx="44" cy="32" rx="3" ry="2.5" fill="var(--cpt, #374151)" opacity={0.2} stroke="none" />
-          <ellipse cx="32" cy="20" rx="5" ry="2" fill="var(--cpt, #374151)" opacity={0.1} stroke="none" />
-        </svg>
-      );
-
-    /* ── 4. Sun spots / pigmentation ── */
-    case "sun-spots":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* small sun rays above head */}
-          <circle cx="50" cy="10" r="4" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.6} />
-          <line x1="50" y1="4" x2="50" y2="2" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          <line x1="54.2" y1="5.8" x2="55.6" y2="4.4" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          <line x1="56" y1="10" x2="58" y2="10" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          <line x1="54.2" y1="14.2" x2="55.6" y2="15.6" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          <line x1="45.8" y1="5.8" x2="44.4" y2="4.4" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          <line x1="44" y1="10" x2="42" y2="10" stroke="var(--cpt, #374151)" strokeWidth="1.1" strokeLinecap="round" opacity={0.6} />
-          {/* sun spots on face */}
-          <circle cx="20" cy="31" r="2" fill="var(--cpt, #374151)" opacity={0.4} stroke="none" />
-          <circle cx="43" cy="30" r="1.8" fill="var(--cpt, #374151)" opacity={0.4} stroke="none" />
-          <circle cx="29" cy="21" r="1.3" fill="var(--cpt, #374151)" opacity={0.35} stroke="none" />
-          <circle cx="36" cy="20" r="1.1" fill="var(--cpt, #374151)" opacity={0.3} stroke="none" />
-        </svg>
-      );
-
-    /* ── 5. Post-acne / surgical marks ── */
-    case "post-acne":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* small raised bump circles (acne) */}
-          <circle cx="20" cy="30" r="2.2" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.55} />
-          <circle cx="43" cy="31" r="1.8" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.55} />
-          <circle cx="26" cy="24" r="1.5" stroke="var(--cpt, #374151)" strokeWidth="1.1" fill="none" opacity={0.5} />
-          <circle cx="38" cy="22" r="1.3" stroke="var(--cpt, #374151)" strokeWidth="1.1" fill="none" opacity={0.45} />
-          {/* small dots for marks */}
-          <circle cx="21" cy="30" r="0.6" fill="var(--cpt, #374151)" stroke="none" opacity={0.5} />
-          <circle cx="44" cy="31" r="0.6" fill="var(--cpt, #374151)" stroke="none" opacity={0.5} />
-          {/* scar line */}
-          <path d="M32 38 Q33 37 34 38.5" stroke="var(--cpt, #374151)" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.4} />
-        </svg>
-      );
-
-    /* ── 6. Acne / pimples ── */
-    case "acne":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          <circle cx="19" cy="29" r="2.5" stroke="var(--cpt, #374151)" strokeWidth="1.3" fill="none" opacity={0.6} />
-          <circle cx="19" cy="29" r="1" fill="var(--cpt, #374151)" stroke="none" opacity={0.4} />
-          <circle cx="44" cy="30" r="2" stroke="var(--cpt, #374151)" strokeWidth="1.3" fill="none" opacity={0.6} />
-          <circle cx="44" cy="30" r="0.9" fill="var(--cpt, #374151)" stroke="none" opacity={0.4} />
-          <circle cx="27" cy="22" r="1.8" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.5} />
-          <circle cx="37" cy="22" r="1.5" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.5} />
-          <circle cx="32" cy="36" r="1.4" stroke="var(--cpt, #374151)" strokeWidth="1.2" fill="none" opacity={0.45} />
-        </svg>
-      );
-
-    /* ── 7. Wrinkles / fine lines ── */
-    case "wrinkles":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* forehead lines */}
-          <path d="M22 19 Q32 17 42 19" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.45} />
-          <path d="M24 22 Q32 20 40 22" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.35} />
-          {/* crow's feet */}
-          <path d="M21.5 25 L18 23 M21.5 26.5 L17.5 26.5 M21.5 28 L18 30" stroke="var(--cpt, #374151)" strokeWidth="0.9" strokeLinecap="round" fill="none" opacity={0.4} />
-          <path d="M42.5 25 L46 23 M42.5 26.5 L46.5 26.5 M42.5 28 L46 30" stroke="var(--cpt, #374151)" strokeWidth="0.9" strokeLinecap="round" fill="none" opacity={0.4} />
-          {/* nasolabial fold */}
-          <path d="M27 34 Q25 37 27 39" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.4} />
-          <path d="M37 34 Q39 37 37 39" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.4} />
-        </svg>
-      );
-
-    /* ── 8. Dryness / flaking ── */
-    case "dryness":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* small flake shapes scattered on face */}
-          <path d="M19 28 L21 28 L20 26 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.45} />
-          <path d="M43 27 L45 27 L44 25 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.45} />
-          <path d="M26 20 L28 20 L27 18 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.4} />
-          <path d="M36 21 L38 21 L37 19 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.4} />
-          <path d="M20 35 L22 35 L21 33 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.4} />
-          <path d="M42 36 L44 36 L43 34 Z" stroke="var(--cpt, #374151)" strokeWidth="0.9" fill="none" opacity={0.4} />
-          {/* crack lines on cheeks */}
-          <path d="M18 31 Q20 32 19 34" stroke="var(--cpt, #374151)" strokeWidth="0.8" fill="none" opacity={0.35} strokeDasharray="1.5 1.5" />
-          <path d="M46 30 Q44 32 45 34" stroke="var(--cpt, #374151)" strokeWidth="0.8" fill="none" opacity={0.35} strokeDasharray="1.5 1.5" />
-        </svg>
-      );
-
-    /* ── 9. Oily skin ── */
-    case "oily":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* shine / glare dots on T-zone */}
-          <ellipse cx="32" cy="18" rx="2" ry="1.5" fill="var(--cpt, #374151)" opacity={0.2} stroke="none" />
-          <ellipse cx="32" cy="22" rx="3" ry="1.5" fill="var(--cpt, #374151)" opacity={0.15} stroke="none" />
-          {/* shine highlight lines */}
-          <path d="M29 17 L30.5 15" stroke="var(--cpt, #374151)" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.4} />
-          <path d="M32 16 L32 14" stroke="var(--cpt, #374151)" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.4} />
-          <path d="M35 17 L36.5 15" stroke="var(--cpt, #374151)" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity={0.4} />
-          {/* oil drops on cheeks */}
-          <path d="M19 32 C19 32 17.5 34.5 19 36 C20.5 36 21 34.5 19 32Z" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.45} />
-          <path d="M45 30 C45 30 43.5 32.5 45 34 C46.5 34 47 32.5 45 30Z" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.45} />
-        </svg>
-      );
-
-    /* ── 10. Dark circles ── */
-    case "dark-circles":
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* dark arcs under each eye */}
-          <path d="M21 30 Q25 33 29 30" stroke="var(--cpt, #374151)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity={0.5} />
-          <path d="M35 30 Q39 33 43 30" stroke="var(--cpt, #374151)" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity={0.5} />
-          {/* shadow fill under eyes */}
-          <ellipse cx="25" cy="30" rx="4" ry="1.5" fill="var(--cpt, #374151)" opacity={0.12} stroke="none" />
-          <ellipse cx="39" cy="30" rx="4" ry="1.5" fill="var(--cpt, #374151)" opacity={0.12} stroke="none" />
-        </svg>
-      );
-
-    /* ── Default / generic skin concern ── */
-    default:
-      return (
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-          <FaceBase />
-          {/* generic star/sparkle to indicate a concern */}
-          <path d="M32 16 L33 20 L37 20 L34 22.5 L35 26.5 L32 24 L29 26.5 L30 22.5 L27 20 L31 20 Z" stroke="var(--cpt, #374151)" strokeWidth="1" fill="none" opacity={0.5} />
-        </svg>
-      );
+    case "dark-spots":   return <IconDarkSpots />;
+    case "melasma":      return <IconMelasma />;
+    case "uneven-tone":  return <IconUnevenTone />;
+    case "sun-spots":    return <IconSunSpots />;
+    case "post-acne":    return <IconPostAcne />;
+    case "acne":         return <IconAcne />;
+    case "wrinkles":     return <IconWrinkles />;
+    case "dark-circles": return <IconDarkCircles />;
+    case "oily":         return <IconOilySkin />;
+    default:             return <IconDarkSpots />;
   }
 }
 
-/* ─── Icon keyword catalogue (used by admin form) ──────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Icon catalogue (used by admin form)                                         */
+/* ─────────────────────────────────────────────────────────────────────────── */
 export const SKIN_CONCERN_OPTIONS: { keyword: string; label: string }[] = [
-  { keyword: "dark-spots", label: "রণের পুরানো দাগ (Dark Spots)" },
-  { keyword: "melasma", label: "কালো ছোপ / মেসমা (Melasma)" },
-  { keyword: "uneven-tone", label: "Uneven Skin Tone" },
-  { keyword: "sun-spots", label: "Sun Spots / Pigmentation" },
-  { keyword: "post-acne", label: "মেসকা / পড়ার পর মুখের দাগ (Post-Acne)" },
-  { keyword: "acne", label: "Acne / Pimples" },
-  { keyword: "wrinkles", label: "Wrinkles / Fine Lines" },
-  { keyword: "dryness", label: "Dryness / Flaking" },
-  { keyword: "oily", label: "Oily Skin" },
+  { keyword: "dark-spots",   label: "রণের পুরানো দাগ (Dark Spots)" },
+  { keyword: "melasma",      label: "কালো ছোপ / মেসমা (Melasma)" },
+  { keyword: "uneven-tone",  label: "Uneven Skin Tone" },
+  { keyword: "sun-spots",    label: "Sun Spots / Pigmentation" },
+  { keyword: "post-acne",    label: "মেসকা / পড়ার পর মুখের দাগ (Post-Acne)" },
+  { keyword: "acne",         label: "Acne / Pimples" },
+  { keyword: "wrinkles",     label: "Wrinkles / Fine Lines" },
   { keyword: "dark-circles", label: "Dark Circles" },
+  { keyword: "oily",         label: "Oily Skin" },
 ];
 
-/* ─── Component ─────────────────────────────────────────────────────────── */
-
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Section component                                                           */
+/* ─────────────────────────────────────────────────────────────────────────── */
 interface Props {
   concerns: SkinConcern[];
   heading?: string;
@@ -251,42 +301,49 @@ export default function SkinConcernsSection({ concerns, heading }: Props) {
 
   return (
     <section className="py-12 px-4 bg-background">
-      <div className="mx-auto max-w-6xl">
-        {/* Section heading */}
+      <div className="mx-auto max-w-7xl">
+
+        {/* Heading */}
         {heading && (
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">{heading}</h2>
+          <div className="mb-10 text-center">
+            <h2
+              className="inline text-2xl font-bold tracking-tight md:text-3xl"
+              style={{
+                color: "#1e2a6e",
+                borderBottom: "2px solid #1e2a6e",
+                paddingBottom: "2px",
+              }}
+            >
+              {heading}
+            </h2>
           </div>
         )}
 
-        {/* Icons row */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+        {/* Icons row — centered, no card border, just circle + label */}
+        <div className="flex flex-wrap justify-between gap-8 sm:gap-10">
           {concerns.map((concern, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center text-center gap-3 w-[110px] sm:w-[120px]"
-            >
-              {/* Circle icon container */}
+            <div key={i} className="flex flex-col items-center gap-3 w-[100px] sm:w-[110px]">
+
+              {/* Circle background */}
               <div
-                className="flex h-[88px] w-[88px] items-center justify-center rounded-full transition-transform duration-200 hover:scale-105"
+                className="flex h-[96px] w-[96px] items-center justify-center rounded-full transition-transform duration-200 hover:scale-105"
                 style={{
-                  background: "var(--cps, #f3f4f6)",
-                  border: "1.5px solid var(--cpr, #e5e7eb)",
+                  background: "#eef0fa",
+                  border: "1.5px solid #c7cdf0",
                 }}
               >
-                <FaceSvg keyword={concern.icon ?? "dark-spots"} />
+                <SkinConcernIcon keyword={concern.icon ?? "dark-spots"} />
               </div>
 
               {/* Label */}
-              <p
-                className="text-xs font-semibold leading-snug"
-                style={{ color: "var(--cpt, #374151)" }}
-              >
+              <p className="text-center text-xs font-medium leading-snug whitespace-pre-line" style={{ color: "#1e2a6e" }}>
                 {concern.label}
               </p>
+
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

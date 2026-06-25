@@ -18,13 +18,13 @@ import {
   Heart,
   Sun,
   Flower2,
-  HelpCircle,
   type LucideIcon,
 } from "lucide-react";
 import type { Campaign } from "@/service/campaign.service";
 import { CampaignService } from "@/service/campaign.service";
 import { themeVars } from "@/lib/campaign-theme";
 import Features from "@/components/campaign/Features";
+import Skin from "@/components/home/Skin";
 import {
   Accordion,
   AccordionItem,
@@ -221,21 +221,34 @@ export default function CampaignPageClient({ campaign }: Props) {
 
 
       {/* ── Dynamic Features section (admin-controlled) ──────────────────────── */}
-      {campaign.features && campaign.features.length > 0 && (
+      {/* {campaign.features && campaign.features.length > 0 && (
         <section className="border-y border-border bg-background py-14">
           <Features features={campaign.features} />
         </section>
-      )}
+      )} */}
 
-      {/* ── Skin Concerns section (face SVG icons) ───────────────────────────── */}
-      {campaign.skinConcerns && campaign.skinConcerns.length > 0 && (
-        <section className="border-b border-border bg-muted/20 py-12">
-          <SkinConcernsSection
-            concerns={campaign.skinConcerns}
-            heading={campaign.skinConcernsHeading}
-          />
-        </section>
-      )}
+      {/* ── What's Your Skin Concern? ─────────────────────────────────────────── */}
+      {/* <section className="border-b border-border">
+        <Skin />
+      </section> */}
+
+      {/* ── Skin Concerns section (face SVG icons) — always shown ───────────── */}
+      <section className="border-b border-border bg-background py-12">
+        <SkinConcernsSection
+          concerns={
+            campaign.skinConcerns && campaign.skinConcerns.length > 0
+              ? campaign.skinConcerns
+              : [
+                  { icon: "dark-spots",  label: "রণের পুরানো দাগ" },
+                  { icon: "melasma",     label: "কালো ছোপ\n(হাইপারপিগমেন্টেশন)" },
+                  { icon: "uneven-tone", label: "Uneven\nSkin Tone" },
+                  { icon: "sun-spots",   label: "Sun Spots /\nPigmentation" },
+                  { icon: "post-acne",   label: "মেসকা, পড়ার পর\nমুখের দাগ" },
+                ]
+          }
+          heading={campaign.skinConcernsHeading ?? "এই সমস্যাগুলোর কি আপনিও ভুগছেন?"}
+        />
+      </section>
 
       {/* ── Ingredient Spotlight ──────────────────────────────────────────── */}
       <IngredientSpotlight />
@@ -295,81 +308,73 @@ export default function CampaignPageClient({ campaign }: Props) {
         </section>
       )}
 
-      {/* ── Why sections (FAQ accordion) ───────────────────────────────────── */}
-      {whySections && (
-        <section className="bg-muted/30 py-14">
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="mb-10 text-center">
-              <div
-                className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
-                style={{ background: "var(--cps, #f3f4f6)", color: "var(--cpt, #374151)" }}
-              >
-                <HelpCircle className="size-3.5" />
-                FAQ
-              </div>
-              <h2 className="text-3xl font-bold tracking-tight">
-                {whySections.length > 1
-                  ? "Questions & Answers"
-                  : whySections[0]?.heading ?? "Frequently Asked Questions"}
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Everything you need to know before you order
-              </p>
-            </div>
+      {/* ── FAQ + Order Form — side-by-side layout ─────────────────────────── */}
+      {(whySections || true) && (
+        <section ref={formRef} className="bg-muted/30 py-12 md:py-16" id="order-form">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="grid gap-6 md:grid-cols-2 md:items-start">
 
-            <div className="space-y-8">
-              {whySections.map((section, si) => {
-                const items = section.items.filter(Boolean);
-                if (items.length === 0) return null;
-                return (
-                  <div key={si} className="rounded-[10px] border border-border bg-card px-5 shadow-sm">
-                    {whySections.length > 1 && section.heading && (
-                      <h3 className="border-b border-border py-4 text-sm font-bold uppercase tracking-wide text-foreground">
-                        {section.heading}
-                      </h3>
-                    )}
-                    <Accordion multiple defaultValue={["why-0-0"]}>
-                      {items.map((item, ii) => {
-                        const { question, answer } = splitFaqItem(item);
-                        return (
-                          <AccordionItem key={ii} value={`why-${si}-${ii}`}>
-                            <AccordionTrigger className="items-center py-5 text-sm font-semibold text-foreground hover:no-underline">
-                              <span className="flex items-center gap-3">
-                                <span className="flex size-6 shrink-0 items-center justify-center rounded-[10px] text-[11px] font-bold" style={{ color: "var(--cpt, #374151)" }}>
-                                  {ii + 1}
-                                </span>
-                                {question}
-                              </span>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <p className="pl-9 text-sm leading-relaxed text-muted-foreground">
-                                {answer ?? item}
-                              </p>
-                            </AccordionContent>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
+              {/* ── LEFT: FAQ accordion ── */}
+              <div className="rounded-[10px] border border-border bg-card shadow-sm overflow-hidden">
+                <div className="border-b border-border bg-muted/20 px-5 py-4">
+                  <h2 className="text-lg font-bold tracking-tight">সাধারণ কিছু প্রশ্ন</h2>
+                </div>
+                {whySections ? (
+                  <div>
+                    {whySections.map((section, si) => {
+                      const items = section.items.filter(Boolean);
+                      if (items.length === 0) return null;
+                      return (
+                        <Accordion key={si} multiple defaultValue={[]}>
+                          {items.map((item, ii) => {
+                            const { question, answer } = splitFaqItem(item);
+                            return (
+                              <AccordionItem
+                                key={ii}
+                                value={`faq-${si}-${ii}`}
+                                className="border-b border-border last:border-b-0"
+                              >
+                                <AccordionTrigger className="flex w-full items-center justify-between px-5 py-4 text-sm font-medium text-foreground hover:bg-muted/30 hover:no-underline transition-colors [&>svg]:hidden">
+                                  <span>{question}</span>
+                                  <span className="ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground text-base font-light">
+                                    +
+                                  </span>
+                                </AccordionTrigger>
+                                <AccordionContent className="px-5 pb-4 pt-0">
+                                  <p className="text-sm leading-relaxed text-muted-foreground">
+                                    {answer ?? item}
+                                  </p>
+                                </AccordionContent>
+                              </AccordionItem>
+                            );
+                          })}
+                        </Accordion>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
+                ) : (
+                  <div className="p-5 text-sm text-muted-foreground">No FAQ available.</div>
+                )}
+              </div>
 
-            <div className="mt-8 text-center">
-              <button
-                onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-[5px] px-8 py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02]"
-                style={{ background: "var(--cp, #171717)" }}
-              >
-                {ctaText} <ArrowRight className="size-4" />
-              </button>
+              {/* ── RIGHT: Order form ── */}
+              <div>
+                <CampaignOrderForm
+                  campaign={campaign}
+                  campaignPrice={campaignPrice}
+                  comparePrice={comparePrice}
+                  discount={discount}
+                  ctaText={ctaText}
+                />
+              </div>
+
             </div>
           </div>
         </section>
       )}
 
       {/* ── What's included ────────────────────────────────────────────────── */}
-      {campaign.included && campaign.included.length > 0 && (
+      {/* {campaign.included && campaign.included.length > 0 && (
         <section className="py-14">
           <div className="mx-auto max-w-7xl px-4">
             <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">What&apos;s Included</h2>
@@ -386,7 +391,7 @@ export default function CampaignPageClient({ campaign }: Props) {
             </div>
           </div>
         </section>
-      )}
+      )} */}
 
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
       {campaign.testimonials && campaign.testimonials.length > 0 && (
@@ -423,24 +428,10 @@ export default function CampaignPageClient({ campaign }: Props) {
           </div>
         </section>
       )} */}
-
       {/* ── Dynamic Ingredients section (admin-controlled) ──────────────────── */}
       {campaign.ingredients && campaign.ingredients.length > 0 && (
         <IngredientsSection ingredients={campaign.ingredients} />
       )}
-
-      {/* ── Order form ─────────────────────────────────────────────────────── */}
-      <section ref={formRef} className="py-14" id="order-form">
-        <div className="mx-auto max-w-7xl px-4">
-          <h2 className="mb-2 text-center text-3xl font-bold tracking-tight">
-            {campaign.formTitle ?? "Order Now"}
-          </h2>
-          <p className="mb-8 text-center text-sm text-muted-foreground">
-            Fill out the form and we&apos;ll get back to you
-          </p>
-          <CampaignOrderForm campaign={campaign} campaignPrice={campaignPrice} ctaText={ctaText} />
-        </div>
-      </section>
 
       {/* ── Mini footer ────────────────────────────────────────────────────── */}
       <footer className="border-t border-border bg-muted/30 py-8">
@@ -535,16 +526,20 @@ function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) 
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/* Order Form Component                                                         */
+/* Order Form Component — matches the screenshot design exactly                */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 function CampaignOrderForm({
   campaign,
   campaignPrice,
+  comparePrice,
+  discount,
   ctaText,
 }: {
   campaign: Campaign;
   campaignPrice: number;
+  comparePrice: number | null;
+  discount: number;
   ctaText: string;
 }) {
   const [name, setName] = useState("");
@@ -552,7 +547,6 @@ function CampaignOrderForm({
   const [address, setAddress] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [zone, setZone] = useState<"INSIDE_DHAKA" | "OUTSIDE_DHAKA">("OUTSIDE_DHAKA");
-  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -574,7 +568,6 @@ function CampaignOrderForm({
         customerAddress: address,
         deliveryZone: zone,
         quantity,
-        notes: notes || undefined,
       });
       setOrderNumber(result?.orderNumber ?? null);
       setSuccess(true);
@@ -585,24 +578,26 @@ function CampaignOrderForm({
     }
   };
 
+  /* ── Success state ── */
   if (success) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "var(--cps, #d1fae5)" }}>
-          <CheckCircle2 className="size-8" style={{ color: "var(--cpt, #059669)" }} />
+      <div className="rounded-[10px] border border-border bg-card p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+          <CheckCircle2 className="size-8 text-emerald-500" />
         </div>
-        <h3 className="mb-2 text-xl font-bold">Order Placed Successfully!</h3>
+        <h3 className="mb-2 text-xl font-bold">অর্ডার সফলভাবে হয়েছে!</h3>
         {orderNumber && (
           <p className="mb-2 text-sm text-muted-foreground">
-            Order Number: <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
+            অর্ডার নম্বর:{" "}
+            <span className="font-mono font-semibold text-foreground">{orderNumber}</span>
           </p>
         )}
         <p className="text-sm text-muted-foreground">
-          We will contact you shortly. Thank you!
+          আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব। ধন্যবাদ!
         </p>
         {campaign.phoneNumber && (
           <p className="mt-4 text-sm">
-            Contact:{" "}
+            যোগাযোগ:{" "}
             <a href={`tel:${campaign.phoneNumber}`} className="font-semibold hover:underline">
               {campaign.phoneNumber}
             </a>
@@ -612,195 +607,174 @@ function CampaignOrderForm({
     );
   }
 
+  /* ── Form ── */
   return (
     <div className="rounded-[10px] border border-border bg-card shadow-sm overflow-hidden">
-      {/* ── Top: product image + title + trust icons ── */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-border bg-muted/30 px-6 py-4">
-        {(campaign.heroImages[0]?.url ?? campaign.product.images[0]?.url) && (
-          <img
-            src={campaign.heroImages[0]?.url ?? campaign.product.images[0]!.url}
-            alt={campaign.product.name}
-            className="size-16 rounded-xl object-cover shadow"
-          />
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-base leading-tight">{campaign.product.name}</p>
-          <p className="text-2xl font-extrabold mt-0.5">{formatPrice(campaignPrice)}</p>
-        </div>
-        {/* Trust strip */}
-        <div className="flex items-center gap-5 text-xs text-muted-foreground ml-auto">
-          <span className="flex flex-col items-center gap-1">
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            Nationwide
-          </span>
-          <span className="flex flex-col items-center gap-1">
-            <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-            Cash on Delivery
-          </span>
-          <span className="flex flex-col items-center gap-1">
-            <ShieldCheck className="size-5" />
-            7-Day Return
-          </span>
-        </div>
+
+      {/* ── Header ── */}
+      <div className="border-b border-border bg-muted/20 px-5 py-4">
+        <h2 className="text-lg font-bold tracking-tight">অর্ডার করতে ফর্মটি পূরণ করুন</h2>
       </div>
 
-      {/* ── Main 2-column layout: form | summary ── */}
-      <div className="grid md:grid-cols-[1fr_280px]">
+      <form onSubmit={handleSubmit} className="px-5 py-5 space-y-3">
 
-        {/* ── Left: ORDER FORM ── */}
-        <form onSubmit={handleSubmit} className="space-y-4 p-6 border-r border-border">
-          <h3 className="text-base font-bold uppercase tracking-wider text-muted-foreground">Order Form</h3>
-
-          {error && (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-              {error}
-            </div>
+        {/* ── Price strip ── */}
+        <div className="flex flex-wrap items-center gap-2 rounded-[6px] bg-muted/30 px-4 py-2.5 text-sm">
+          {comparePrice && (
+            <span className="text-muted-foreground">
+              Regular Price:{" "}
+              <span className="font-semibold line-through text-red-500">
+                {formatPrice(comparePrice)}
+              </span>
+            </span>
           )}
+          <span className="text-muted-foreground">
+            Offer Price:{" "}
+            <span className="font-bold text-green-600">{formatPrice(campaignPrice)}</span>
+          </span>
+          {discount > 0 && (
+            <span className="rounded-[4px] bg-blue-600 px-2 py-0.5 text-[11px] font-bold text-white">
+              {discount}% ছাড়
+            </span>
+          )}
+        </div>
 
-          {/* Name + Phone side by side */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground">Your Name *</label>
-              <input
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground">Phone Number *</label>
-              <input
-                required
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="01XXXXXXXXX"
-                className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
+        {error && (
+          <div className="rounded-[6px] border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
           </div>
+        )}
 
-          {/* Address */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground">Address *</label>
-            <textarea
-              required
-              rows={2}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="House / Road / Area / District"
-              className="w-full rounded-[5px] border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
-            />
-          </div>
+        {/* ── Name input ── */}
+        <div className="relative">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          </span>
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="আপনার নাম"
+            className="h-11 w-full rounded-[6px] border border-input bg-background pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-          {/* Notes */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground">Special Notes (Optional)</label>
-            <input
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any special instructions"
-              className="h-10 w-full rounded-[5px] border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        {/* ── Phone input ── */}
+        <div className="relative">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3.1 5.18 2 2 0 0 1 5.08 3h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.72 2.81a2 2 0 0 1-.45 2.11L9.09 10.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.36 1.85.6 2.81.72A2 2 0 0 1 22 17z"/>
+            </svg>
+          </span>
+          <input
+            required
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="মোবাইল নাম্বার"
+            className="h-11 w-full rounded-[6px] border border-input bg-background pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-          {/* Quantity */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground">Quantity</label>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-lg font-bold hover:bg-muted transition-colors"
-              >
-                −
-              </button>
-              <span className="w-10 text-center text-base font-bold">{quantity}</span>
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-lg font-bold hover:bg-muted transition-colors"
-              >
-                +
-              </button>
-              <span className="text-xs text-muted-foreground">× {formatPrice(campaignPrice)} = {formatPrice(subtotal)}</span>
-            </div>
-          </div>
+        {/* ── Address input ── */}
+        <div className="relative">
+          <span className="pointer-events-none absolute top-3 left-3 text-muted-foreground">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 21C12 21 5 13.5 5 8.5a7 7 0 0 1 14 0C19 13.5 12 21 12 21z"/><circle cx="12" cy="8.5" r="2.5"/>
+            </svg>
+          </span>
+          <textarea
+            required
+            rows={2}
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="পূর্ণ ঠিকানা (বাড়ি, রোড, এলাকা)"
+            className="w-full rounded-[6px] border border-input bg-background pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
+          />
+        </div>
 
-          {/* Delivery zone */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-muted-foreground">Delivery Zone</label>
-            <div className="flex flex-col gap-2">
-              {(["INSIDE_DHAKA", "OUTSIDE_DHAKA"] as const).map((z) => (
-                <label key={z} className="flex items-center gap-2.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="zone"
-                    checked={zone === z}
-                    onChange={() => setZone(z)}
-                    className="accent-foreground"
-                  />
-                  <span className="text-sm">
-                    {z === "INSIDE_DHAKA" ? "Delivery Inside Dhaka" : "Outside Dhaka"}
-                    <span className="ml-1 text-muted-foreground">(Fee: ৳{z === "INSIDE_DHAKA" ? "60" : "120"})</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 py-3 text-base font-bold text-white shadow-lg transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 rounded-[5px]"
-            style={{ background: "var(--cp, #171717)" }}
+        {/* ── Quantity select ── */}
+        <div className="relative">
+          <select
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            className="h-11 w-full appearance-none rounded-[6px] border border-input bg-background px-3 pr-8 text-sm outline-none focus:ring-2 focus:ring-ring cursor-pointer"
           >
-            {submitting ? (
-              <><Loader2 className="size-5 animate-spin" /> Please wait...</>
-            ) : (
-              <><ShoppingCart className="size-5" /> {ctaText}</>
-            )}
-          </button>
-        </form>
-
-        {/* ── Right: ORDER SUMMARY ── */}
-        <div className="p-6 bg-muted/20 flex flex-col gap-4">
-          <h3 className="text-base font-bold uppercase tracking-wider text-center border-b border-border pb-3">
-            Order Summary
-          </h3>
-          <div className="space-y-3 text-sm flex-1">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Item Price ({quantity}pc)</span>
-              <span className="font-semibold">{formatPrice(subtotal)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery Charge</span>
-              <span className="font-semibold">{formatPrice(shipping)}</span>
-            </div>
-            <div className="flex justify-between border-t border-border pt-3 text-base">
-              <span className="font-bold">Total</span>
-              <span className="font-extrabold text-lg">{formatPrice(total)}</span>
-            </div>
-          </div>
-
-          {/* Trust badges */}
-          <div className="mt-auto space-y-2 pt-4 border-t border-border">
-            {[
-              { icon: <CheckCheck className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "100% Authentic Products" },
-              { icon: <ShieldCheck className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "Secure Order Processing" },
-              { icon: <CheckCircle2 className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "Cash on Delivery Available" },
-            ].map(({ icon, text }) => (
-              <div key={text} className="flex items-center gap-2 text-xs text-muted-foreground">
-                {icon}
-                {text}
-              </div>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <option key={n} value={n}>
+                {n}টি পিস
+              </option>
             ))}
+          </select>
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground">
+            <ChevronDown className="size-4" />
+          </span>
+        </div>
+
+        {/* ── Delivery zone ── */}
+        <div className="grid grid-cols-2 gap-2">
+          {(["INSIDE_DHAKA", "OUTSIDE_DHAKA"] as const).map((z) => (
+            <label
+              key={z}
+              className={`flex cursor-pointer items-center gap-2 rounded-[6px] border px-3 py-2.5 text-xs font-medium transition-colors ${
+                zone === z
+                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  : "border-border bg-background text-muted-foreground hover:bg-muted/30"
+              }`}
+            >
+              <input
+                type="radio"
+                name="zone"
+                checked={zone === z}
+                onChange={() => setZone(z)}
+                className="hidden"
+              />
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${zone === z ? "border-blue-500" : "border-muted-foreground"}`}>
+                {zone === z && <span className="h-2 w-2 rounded-full bg-blue-500" />}
+              </span>
+              <span>
+                {z === "INSIDE_DHAKA" ? "ঢাকার ভেতরে" : "ঢাকার বাইরে"}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {/* ── Fee rows ── */}
+        <div className="space-y-2 rounded-[6px] bg-muted/20 px-4 py-3 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">ডেলিভারি চার্জ</span>
+            <span className="font-semibold">৳{shipping}</span>
+          </div>
+          <div className="flex items-center justify-between border-t border-border pt-2">
+            <span className="font-bold">মোট পরিশোধযোগ্য</span>
+            <span className="text-lg font-extrabold">৳{total.toLocaleString("en-BD")}</span>
           </div>
         </div>
 
-      </div>
+        {/* ── Submit button ── */}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex w-full items-center justify-center gap-2 rounded-[6px] bg-blue-600 py-3.5 text-sm font-bold text-white shadow transition-all hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {submitting ? (
+            <><Loader2 className="size-5 animate-spin" /> অপেক্ষা করুন...</>
+          ) : (
+            <><ShoppingCart className="size-5" /> অর্ডার কনফার্ম করুন</>
+          )}
+        </button>
+
+        {/* ── Trust line ── */}
+        <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          আপনার তথ্য ১০০% সুরক্ষিত এবং গোপন রাখা হবে
+        </p>
+
+      </form>
     </div>
   );
 }
