@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CampaignService } from "@/service/campaign.service";
+import { FooterServer } from "@/components/footer/FooterServer";
 import CampaignPageClient from "./CampaignPageClient";
 
 type Params = Promise<{ slug: string }>;
@@ -35,5 +36,10 @@ export default async function CampaignPage({ params }: { params: Params }) {
 
   if (campaign.status !== "ACTIVE") notFound();
 
-  return <CampaignPageClient campaign={campaign} />;
+  return (
+    <>
+      <CampaignPageClient campaign={campaign} />
+      
+    </>
+  );
 }

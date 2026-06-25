@@ -433,26 +433,63 @@ export default function CampaignPageClient({ campaign }: Props) {
         <IngredientsSection ingredients={campaign.ingredients} />
       )}
 
-      {/* ── Mini footer ────────────────────────────────────────────────────── */}
-      <footer className="border-t border-border bg-muted/30 py-8">
-        <div className="mx-auto max-w-5xl px-4 text-center">
-          <Link href="/" className="mb-3 inline-flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-foreground text-background text-[9px] font-bold tracking-widest">
-              DQ
-            </div>
-            <span className="text-sm font-semibold">Dermoqore</span>
-          </Link>
-          <p className="text-xs text-muted-foreground">
-            Delivery across Bangladesh | 7-Day Return Policy | 100% Authentic Products
-          </p>
-          {phone && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Support:{" "}
-              <a href={`tel:${phone}`} className="font-medium text-foreground">{phone}</a>
-            </p>
+
+      <div className="mb-[-70px]" style={{ background: "#1a2466" }}>
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6">
+
+          {/* Product image */}
+          {(campaign.heroImages[0]?.url ?? campaign.product.images[0]?.url) && (
+            <img
+              src={campaign.heroImages[0]?.url ?? campaign.product.images[0]!.url}
+              alt={campaign.product.name}
+              className="h-12 w-10 shrink-0 rounded object-cover sm:h-14 sm:w-12"
+            />
           )}
+
+          {/* Product name + subtitle */}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-bold text-white sm:text-sm">
+              {campaign.product.name}
+            </p>
+            <p className="truncate text-[10px] text-white/60 sm:text-xs">
+              {campaign.subtitle ?? "Science Based Formula | BTRI Lab Tested"}
+            </p>
+          </div>
+
+          {/* Price block */}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-lg font-extrabold text-white sm:text-xl">
+              {formatPrice(campaignPrice)}
+            </span>
+            {comparePrice && (
+              <>
+                <span className="text-xs text-white/50 line-through sm:text-sm">
+                  {formatPrice(comparePrice)}
+                </span>
+                {discount > 0 && (
+                  <span className="rounded-[4px] bg-blue-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {discount}% ছাড়
+                  </span>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* CTA button */}
+          <button
+            onClick={scrollToForm}
+            className="ml-2 flex shrink-0 items-center gap-1.5 rounded-[5px] bg-white px-3 py-2.5 text-[11px] font-bold text-[#1a2466] transition-opacity hover:opacity-90 sm:px-5 sm:text-xs"
+          >
+            <ShoppingCart className="size-3.5 sm:size-4" />
+            <span className="hidden sm:inline">অর্ডার করুন এখনই</span>
+            <span className="sm:hidden">অর্ডার করুন</span>
+          </button>
+
         </div>
-      </footer>
+      </div>
+
+      {/* spacer so page content isn't hidden behind the sticky bar */}
+      <div className="h-16" />
     </div>
   );
 }
