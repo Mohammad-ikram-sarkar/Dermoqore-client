@@ -2,6 +2,7 @@ const BASE = process.env.API_URL ?? "http://localhost:8000";
 const PUBLIC_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export type CampaignStatus = "DRAFT" | "ACTIVE" | "ENDED";
+export type CampaignTheme = "DEFAULT" | "EMERALD" | "ROSE" | "OCEAN" | "AMBER";
 
 export interface CampaignImage {
   id: string;
@@ -19,6 +20,25 @@ export interface Testimonial {
   name: string;
   location?: string;
   text: string;
+}
+
+export interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface Ingredient {
+  name: string;
+  image: string;
+  description: string;
+}
+
+export interface SkinConcern {
+  /** keyword maps to the face SVG variant, e.g. "dark-spots", "melasma" */
+  icon: string;
+  /** Short label displayed below the icon */
+  label: string;
 }
 
 export interface Campaign {
@@ -46,6 +66,11 @@ export interface Campaign {
   benefits?: string[];
   testimonials?: Testimonial[];
   included?: string[];
+  features?: Feature[];
+  skinConcerns?: SkinConcern[];
+  skinConcernsHeading?: string;
+  ingredients?: Ingredient[];
+  theme: CampaignTheme;
   offerBadge?: string;
   ctaText?: string;
   phoneNumber?: string;

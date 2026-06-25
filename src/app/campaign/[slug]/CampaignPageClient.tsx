@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import type { Campaign } from "@/service/campaign.service";
 import { CampaignService } from "@/service/campaign.service";
+import { themeVars } from "@/lib/campaign-theme";
 import Features from "@/components/campaign/Features";
 import {
   Accordion,
@@ -31,6 +32,9 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import IngredientsSection from "@/components/campaign/IngredientsSection";
+import SkinConcernsSection from "@/components/campaign/SkinConcernsSection";
+import Realface from "@/components/home/Realface";
+import IngredientSpotlight from "@/components/home/IngredientSpotlight";
 
 function getYouTubeId(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
@@ -111,10 +115,12 @@ export default function CampaignPageClient({ campaign }: Props) {
 
   // capture narrowed, non-empty optional arrays once (so callbacks keep the type)
   const whySections = campaign.whySections?.length ? campaign.whySections : null;
-  const benefits = campaign.benefits?.length ? campaign.benefits : null;
+
+  // Theme CSS vars scoped to the wrapper
+  const vars = themeVars(campaign.theme);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground" style={vars}>
       {/* ── Top header bar ─────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -128,7 +134,8 @@ export default function CampaignPageClient({ campaign }: Props) {
             {phone && (
               <a
                 href={`tel:${phone}`}
-                className="flex items-center gap-1.5 rounded-[5px] bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+                className="flex items-center gap-1.5 rounded-[5px] px-3 py-1.5 text-xs font-semibold text-white"
+                style={{ background: "var(--cp, #171717)" }}
               >
                 <Phone className="size-3" />
                 {phone}
@@ -144,117 +151,94 @@ export default function CampaignPageClient({ campaign }: Props) {
         </div>
       </header>
 
-      {/* ── Hero section ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden ">
-        {/* decorative blurred blobs */}
-        <div className="pointer-events-none absolute -left-24 -top-24 size-72 \ blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 right-0 size-80 rounded-full blur-3xl" />
+      {/* ── Hero section (full‑width banner like home page) ─────────────────── */}
+      <section className="relative w-full overflow-hidden bg-secondary">
+        <div className="relative h-[400px] w-full sm:h-[480px] md:h-[520px] lg:h-[550px]">
+          <div className="absolute inset-0">
+            {primaryImage ? (
+              <img
+                src={primaryImage}
+                alt={campaign.title}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/5 md:via-background/55" />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-12 md:py-20">
-          <div className="grid items-center gap-10 md:grid-cols-2">
-            {/* Left — text */}
-            <div className="space-y-6 md:order-1 order-2">
+          <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 py-5 sm:px-8 sm:py-8 md:px-10 md:py-10 lg:py-14">
+            <div className="max-w-xl">
               {campaign.offerBadge && (
-                <span className="inline-flex items-center gap-1.5 rounded-[5px] bg-emerald-500 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow">
-                
+                <span
+                  className="inline-flex items-center gap-1 rounded-[5px] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow sm:gap-1.5 sm:px-4 sm:py-1.5 sm:text-xs"
+                  style={{ background: "var(--cp, #059669)" }}
+                >
                   {campaign.offerBadge}
                 </span>
               )}
-              <h1 className="text-4xl font-extralight leading-[1.1] tracking-tight md:text-5xl">
+              <h1 className="mt-1.5 max-w-lg whitespace-pre-line text-2xl font-bold leading-tight text-foreground sm:mt-3 sm:text-4xl md:text-5xl md:leading-[0.98] lg:text-6xl">
                 {campaign.title}
               </h1>
               {campaign.subtitle && (
-                <p className="max-w-md text-lg text-muted-foreground">{campaign.subtitle}</p>
+                <p className="mt-2 max-w-md text-[11px] font-medium leading-relaxed text-muted-foreground sm:mt-4 sm:text-sm md:mt-5 md:text-base">
+                  {campaign.subtitle}
+                </p>
               )}
 
-              {/* Star rating */}
-              {/* <div className="flex items-center gap-2">
-                <div className="flex">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="size-5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  4.9 (2,500+ happy customers)
-                </span>
-              </div> */}
-
               {/* Pricing */}
-              <div className="flex flex-wrap items-baseline gap-3">
-                <span className="text-5xl font-bold text-foreground">
+              <div className="mt-3 flex flex-wrap items-baseline gap-1.5 sm:mt-5 sm:gap-3 md:mt-6">
+                {comparePrice && (
+                  <span className="text-base text-muted-foreground line-through sm:text-xl">
+                    {formatPrice(comparePrice)}
+                  </span>
+                )}
+                <span className="text-2xl font-bold text-foreground sm:text-4xl md:text-5xl">
                   {formatPrice(campaignPrice)}
                 </span>
                 {comparePrice && (
-                  <>
-                    <span className="text-xl text-muted-foreground line-through">
-                      {formatPrice(comparePrice)}
-                    </span>
-                    <span className="rounded-[5px] bg-emerald-500 px-3 py-1 text-sm font-bold text-white">
-                      {discount}% OFF
-                    </span>
-                  </>
+                  <span
+                    className="rounded-[5px] px-1.5 py-0.5 text-[10px] font-bold text-white sm:px-3 sm:py-1 sm:text-sm"
+                    style={{ background: "var(--cp, #059669)" }}
+                  >
+                    {discount}% OFF
+                  </span>
                 )}
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="mt-3 flex flex-wrap gap-2 sm:mt-5 sm:gap-3 md:mt-6">
                 <button
                   onClick={scrollToForm}
-                  className="flex items-center justify-center gap-2 rounded-[10px] bg-foreground px-8 py-2 text-base font-sans text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
+                  className="inline-flex h-9 items-center justify-center gap-1 rounded-[5px] bg-foreground px-5 text-[9px] font-bold tracking-[0.12em] text-background uppercase transition-opacity hover:opacity-80 sm:h-11 sm:px-8 sm:text-[11px] sm:gap-2"
                 >
-                  <ShoppingCart className="size-5" />
+                  <ShoppingCart className="size-2.5 sm:size-4" />
                   {ctaText}
                 </button>
-                {phone && (
-                  <a
-                    href={`tel:${phone}`}
-                    className="flex items-center justify-center gap-2 rounded-[10px] border-2 border-foreground/15 bg-background/60 px-6 py-2 text-sm font-medium backdrop-blur transition-colors hover:bg-muted"
-                  >
-                    <Phone className="size-4" />
-                    {phone}
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Right — image */}
-            <div className="relative md:order-2 order-1">
-              <div className="relative mx-auto flex max-w-md justify-center">
-                {/* glow behind product */}
-                <div className="absolute inset-0 m-auto size-72 rounded-full blur-2xl" />
-                {primaryImage ? (
-                  <img
-                    src={primaryImage}
-                    alt={campaign.title}
-                    className="relative max-h-[500px]   w-full rounded-[10px] object-cover shadow-2xl"
-                  />
-                ) : (
-                  <div className="relative flex h-80 w-full items-center justify-center rounded-3xl bg-muted text-muted-foreground">
-                    No image
-                  </div>
-                )}
-
-                {/* floating discount badge */}
-                {/* {discount > 0 && (
-                  <div className="absolute -right-3 -top-3 flex size-20 flex-col items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg md:-right-4 md:-top-4">
-                    <span className="text-lg font-extrabold leading-none">{discount}%</span>
-                    <span className="text-[10px] font-bold uppercase">OFF</span>
-                    <span className="text-[9px] font-medium opacity-80">Today</span>
-                  </div>
-                )} */}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Key Benefits section ──────────────────────────────────────────── */}
-         
-      {campaign.benefits && campaign.benefits.length > 0 && (
+
+      {/* ── Dynamic Features section (admin-controlled) ──────────────────────── */}
+      {campaign.features && campaign.features.length > 0 && (
         <section className="border-y border-border bg-background py-14">
-          <Features/>
-          
+          <Features features={campaign.features} />
         </section>
       )}
+
+      {/* ── Skin Concerns section (face SVG icons) ───────────────────────────── */}
+      {campaign.skinConcerns && campaign.skinConcerns.length > 0 && (
+        <section className="border-b border-border bg-muted/20 py-12">
+          <SkinConcernsSection
+            concerns={campaign.skinConcerns}
+            heading={campaign.skinConcernsHeading}
+          />
+        </section>
+      )}
+
+      {/* ── Ingredient Spotlight ──────────────────────────────────────────── */}
+      <IngredientSpotlight />
 
       {/* ── Hero image gallery (additional images) ─────────────────────────── */}
       {campaign.heroImages.length > 1 && (
@@ -273,6 +257,9 @@ export default function CampaignPageClient({ campaign }: Props) {
           </div>
         </section>
       )}
+
+      {/* ── Real Results section ───────────────────────────────────────────── */}
+      <Realface />
 
       {/* ── Video section ──────────────────────────────────────────────────── */}
       {videoId && (
@@ -298,7 +285,8 @@ export default function CampaignPageClient({ campaign }: Props) {
             <div className="mt-6">
               <button
                 onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-[5px] bg-foreground px-8 py-2 text-sm font-bold text-background shadow-lg transition-all hover:scale-[1.02] hover:bg-foreground/90"
+                className="inline-flex items-center gap-2 rounded-[5px] px-8 py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02]"
+                style={{ background: "var(--cp, #171717)" }}
               >
                 {ctaText} <ArrowRight className="size-4" />
               </button>
@@ -312,7 +300,10 @@ export default function CampaignPageClient({ campaign }: Props) {
         <section className="bg-muted/30 py-14">
           <div className="mx-auto max-w-7xl px-4">
             <div className="mb-10 text-center">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-foreground/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-foreground">
+              <div
+                className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
+                style={{ background: "var(--cps, #f3f4f6)", color: "var(--cpt, #374151)" }}
+              >
                 <HelpCircle className="size-3.5" />
                 FAQ
               </div>
@@ -344,7 +335,7 @@ export default function CampaignPageClient({ campaign }: Props) {
                           <AccordionItem key={ii} value={`why-${si}-${ii}`}>
                             <AccordionTrigger className="items-center py-5 text-sm font-semibold text-foreground hover:no-underline">
                               <span className="flex items-center gap-3">
-                                <span className="flex size-6 shrink-0 items-center justify-center rounded-[10px]  text-[11px] font-bold ">
+                                <span className="flex size-6 shrink-0 items-center justify-center rounded-[10px] text-[11px] font-bold" style={{ color: "var(--cpt, #374151)" }}>
                                   {ii + 1}
                                 </span>
                                 {question}
@@ -367,7 +358,8 @@ export default function CampaignPageClient({ campaign }: Props) {
             <div className="mt-8 text-center">
               <button
                 onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-[5px] bg-foreground px-8 py-2 text-sm font-bold text-background shadow-lg transition-all hover:scale-[1.02] hover:bg-foreground/90"
+                className="inline-flex items-center gap-2 rounded-[5px] px-8 py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02]"
+                style={{ background: "var(--cp, #171717)" }}
               >
                 {ctaText} <ArrowRight className="size-4" />
               </button>
@@ -386,7 +378,7 @@ export default function CampaignPageClient({ campaign }: Props) {
               <ul className="space-y-3">
                 {campaign.included.filter(Boolean).map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
-                    <CheckCheck className="size-5 shrink-0 text-emerald-600" />
+                    <CheckCheck className="size-5 shrink-0" style={{ color: "var(--cpt, #059669)" }} />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -396,65 +388,15 @@ export default function CampaignPageClient({ campaign }: Props) {
         </section>
       )}
 
-      {/* ── Phone bar ──────────────────────────────────────────────────────── */}
-      {/* {phone && (
-        <section className="bg-foreground py-6">
-          <div className="mx-auto max-w-6xl px-4 text-center">
-            <p className="mb-2 text-sm font-medium text-background/80">
-              Call us 24/7 for any query
-            </p>
-            <a
-              href={`tel:${phone}`}
-              className="inline-flex items-center gap-2 text-2xl font-bold text-background hover:underline"
-            >
-              <Phone className="size-5" />
-              {phone}
-            </a>
-          </div>
-        </section>
-      )} */}
-
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
       {campaign.testimonials && campaign.testimonials.length > 0 && (
         <TestimonialsSection testimonials={campaign.testimonials} />
       )}
- 
-      {/* ── Offer strip ────────────────────────────────────────────────────── */}
-      {/* <section className="bg-muted/40 py-14">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          {campaign.offerBadge && (
-            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-destructive px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow">
-              <Sparkles className="size-3.5" />
-              {campaign.offerBadge}
-            </span>
-          )}
-          <div className="mt-2 flex flex-wrap items-baseline justify-center gap-3">
-            <span className="text-6xl font-extrabold">{formatPrice(campaignPrice)}</span>
-            {comparePrice && (
-              <span className="text-xl text-muted-foreground line-through">{formatPrice(comparePrice)}</span>
-            )}
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            + Delivery: ৳60 (Inside Dhaka) | ৳120 (Outside Dhaka)
-          </p>
-          <button
-            onClick={scrollToForm}
-            className="mt-6 inline-flex items-center gap-2 rounded-[5px] bg-foreground px-10 py-2 text-base font-bold text-background shadow-xl transition-all hover:scale-[1.02] hover:bg-foreground/90"
-          >
-            <ShoppingCart className="size-5" />
-            {ctaText}
-          </button>
-          {phone && (
-            <p className="mt-4 text-sm text-muted-foreground">
-              Or call:{" "}
-              <a href={`tel:${phone}`} className="font-semibold text-foreground hover:underline">
-                {phone}
-              </a>
-            </p>
-          )}
-        </div>
-      </section> */}
-      <div className="mx-auto max-w-7xl px-4">
+
+      {/* ── Key Benefits section ──────────────────────────────────────────── */}
+      {/* {campaign.benefits && campaign.benefits.length > 0 && (
+        <section className="py-14 bg-background">
+          <div className="mx-auto max-w-7xl px-4">
             <div className="mb-10 text-center">
               <h2 className="text-3xl font-bold tracking-tight">Key Benefits</h2>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -479,7 +421,13 @@ export default function CampaignPageClient({ campaign }: Props) {
               })}
             </div>
           </div>
-                  <IngredientsSection/>
+        </section>
+      )} */}
+
+      {/* ── Dynamic Ingredients section (admin-controlled) ──────────────────── */}
+      {campaign.ingredients && campaign.ingredients.length > 0 && (
+        <IngredientsSection ingredients={campaign.ingredients} />
+      )}
 
       {/* ── Order form ─────────────────────────────────────────────────────── */}
       <section ref={formRef} className="py-14" id="order-form">
@@ -552,7 +500,7 @@ function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) 
               </div>
               <p className="mb-4 text-sm leading-relaxed text-muted-foreground">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center gap-3 border-t border-border pt-3">
-                <div className="flex size-9 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
+                <div className="flex size-9 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: "var(--cp, #171717)" }}>
                   {t.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -640,8 +588,8 @@ function CampaignOrderForm({
   if (success) {
     return (
       <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-          <CheckCircle2 className="size-8 text-emerald-600" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "var(--cps, #d1fae5)" }}>
+          <CheckCircle2 className="size-8" style={{ color: "var(--cpt, #059669)" }} />
         </div>
         <h3 className="mb-2 text-xl font-bold">Order Placed Successfully!</h3>
         {orderNumber && (
@@ -806,7 +754,8 @@ function CampaignOrderForm({
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-[5px]-500 py-3 text-base font-bold text-white bg-black shadow-lg transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 rounded-[5px]"
+            className="flex w-full items-center justify-center gap-2 py-3 text-base font-bold text-white shadow-lg transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 rounded-[5px]"
+            style={{ background: "var(--cp, #171717)" }}
           >
             {submitting ? (
               <><Loader2 className="size-5 animate-spin" /> Please wait...</>
@@ -839,9 +788,9 @@ function CampaignOrderForm({
           {/* Trust badges */}
           <div className="mt-auto space-y-2 pt-4 border-t border-border">
             {[
-              { icon: <CheckCheck className="size-4 text-emerald-600" />, text: "100% Authentic Products" },
-              { icon: <ShieldCheck className="size-4 text-emerald-600" />, text: "Secure Order Processing" },
-              { icon: <CheckCircle2 className="size-4 text-emerald-600" />, text: "Cash on Delivery Available" },
+              { icon: <CheckCheck className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "100% Authentic Products" },
+              { icon: <ShieldCheck className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "Secure Order Processing" },
+              { icon: <CheckCircle2 className="size-4" style={{ color: "var(--cpt, #059669)" }} />, text: "Cash on Delivery Available" },
             ].map(({ icon, text }) => (
               <div key={text} className="flex items-center gap-2 text-xs text-muted-foreground">
                 {icon}
@@ -855,5 +804,3 @@ function CampaignOrderForm({
     </div>
   );
 }
-
-
