@@ -115,6 +115,7 @@ export default function CampaignPageClient({ campaign }: Props) {
 
   // capture narrowed, non-empty optional arrays once (so callbacks keep the type)
   const whySections = campaign.whySections?.length ? campaign.whySections : null;
+  const faqs = campaign.faqs?.length ? campaign.faqs : null;
 
   // Theme CSS vars scoped to the wrapper
   const vars = themeVars(campaign.theme);
@@ -309,69 +310,88 @@ export default function CampaignPageClient({ campaign }: Props) {
       )}
 
       {/* ── FAQ + Order Form — side-by-side layout ─────────────────────────── */}
-      {(whySections || true) && (
-        <section ref={formRef} className="bg-muted/30 py-12 md:py-16" id="order-form">
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="grid gap-6 md:grid-cols-2 md:items-start">
+      <section ref={formRef} className="bg-muted/30 py-12 md:py-16" id="order-form">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="grid gap-6 md:grid-cols-2 md:items-start">
 
-              {/* ── LEFT: FAQ accordion ── */}
-              <div className="rounded-[10px] border border-border bg-card shadow-sm overflow-hidden">
-                <div className="border-b border-border bg-muted/20 px-5 py-4">
-                  <h2 className="text-lg font-bold tracking-tight">সাধারণ কিছু প্রশ্ন</h2>
-                </div>
-                {whySections ? (
-                  <div>
-                    {whySections.map((section, si) => {
-                      const items = section.items.filter(Boolean);
-                      if (items.length === 0) return null;
-                      return (
-                        <Accordion key={si} multiple defaultValue={[]}>
-                          {items.map((item, ii) => {
-                            const { question, answer } = splitFaqItem(item);
-                            return (
-                              <AccordionItem
-                                key={ii}
-                                value={`faq-${si}-${ii}`}
-                                className="border-b border-border last:border-b-0"
-                              >
-                                <AccordionTrigger className="flex w-full items-center justify-between px-5 py-4 text-sm font-medium text-foreground hover:bg-muted/30 hover:no-underline transition-colors [&>svg]:hidden">
-                                  <span>{question}</span>
-                                  <span className="ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground text-base font-light">
-                                    +
-                                  </span>
-                                </AccordionTrigger>
-                                <AccordionContent className="px-5 pb-4 pt-0">
-                                  <p className="text-sm leading-relaxed text-muted-foreground">
-                                    {answer ?? item}
-                                  </p>
-                                </AccordionContent>
-                              </AccordionItem>
-                            );
-                          })}
-                        </Accordion>
-                      );
-                    })}
-                  </div>
+            {/* ── LEFT: FAQ accordion — driven by campaign.faqs ── */}
+            <div className="rounded-[10px] border border-border bg-card shadow-sm overflow-hidden">
+              {/* Header */}
+              <div className="border-b border-border px-5 py-4">
+                <h2 className="text-xl font-bold tracking-tight">সাধারণ কিছু প্রশ্ন</h2>
+              </div>
+
+              {faqs && faqs.length > 0 ? (
+                <Accordion multiple defaultValue={[]}>
+                  {faqs.map((faq, i) => (
+                    <AccordionItem
+                      key={faq.id ?? i}
+                      value={`faq-${i}`}
+                      className="border-b border-border last:border-b-0"
+                    >
+                      <AccordionTrigger className="flex w-full items-center justify-between px-5 py-4 text-sm font-semibold text-foreground hover:bg-muted/20 hover:no-underline transition-colors [&>svg]:hidden">
+                        <span className="text-left">{faq.question}</span>
+                        <span className="ml-4 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-light text-muted-foreground leading-none">
+                          +
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-5 pb-5 pt-1">
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {faq.answer}
+                        </p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              ) : (
+                /* fallback to whySections if no dedicated faqs yet */
+                whySections && whySections.length > 0 ? (
+                  <Accordion multiple defaultValue={[]}>
+                    {whySections.flatMap((section, si) =>
+                      section.items.filter(Boolean).map((item, ii) => {
+                        const { question, answer } = splitFaqItem(item);
+                        return (
+                          <AccordionItem
+                            key={`${si}-${ii}`}
+                            value={`faq-${si}-${ii}`}
+                            className="border-b border-border last:border-b-0"
+                          >
+                            <AccordionTrigger className="flex w-full items-center justify-between px-5 py-4 text-sm font-semibold text-foreground hover:bg-muted/20 hover:no-underline transition-colors [&>svg]:hidden">
+                              <span className="text-left">{question}</span>
+                              <span className="ml-4 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-light text-muted-foreground leading-none">
+                                +
+                              </span>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-5 pb-5 pt-1">
+                              <p className="text-sm leading-relaxed text-muted-foreground">
+                                {answer ?? item}
+                              </p>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      })
+                    )}
+                  </Accordion>
                 ) : (
-                  <div className="p-5 text-sm text-muted-foreground">No FAQ available.</div>
-                )}
-              </div>
-
-              {/* ── RIGHT: Order form ── */}
-              <div>
-                <CampaignOrderForm
-                  campaign={campaign}
-                  campaignPrice={campaignPrice}
-                  comparePrice={comparePrice}
-                  discount={discount}
-                  ctaText={ctaText}
-                />
-              </div>
-
+                  <p className="p-5 text-sm text-muted-foreground">কোনো প্রশ্ন পাওয়া যায়নি।</p>
+                )
+              )}
             </div>
+
+            {/* ── RIGHT: Order form ── */}
+            <div>
+              <CampaignOrderForm
+                campaign={campaign}
+                campaignPrice={campaignPrice}
+                comparePrice={comparePrice}
+                discount={discount}
+                ctaText={ctaText}
+              />
+            </div>
+
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ── What's included ────────────────────────────────────────────────── */}
       {/* {campaign.included && campaign.included.length > 0 && (

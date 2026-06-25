@@ -41,6 +41,13 @@ export interface SkinConcern {
   label: string;
 }
 
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  sortOrder: number;
+}
+
 export interface Campaign {
   id: string;
   slug: string;
@@ -70,6 +77,7 @@ export interface Campaign {
   skinConcerns?: SkinConcern[];
   skinConcernsHeading?: string;
   ingredients?: Ingredient[];
+  faqs?: FaqItem[];
   theme: CampaignTheme;
   offerBadge?: string;
   ctaText?: string;
