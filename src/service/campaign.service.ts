@@ -25,6 +25,8 @@ export interface Testimonial {
 export interface CustomerReview {
   name: string;
   title?: string;
+  videoTitle?: string;
+  videoDescription?: string;
   videoUrl: string;
 }
 
@@ -73,6 +75,8 @@ export interface Campaign {
   heroImages: CampaignImage[];
   videoUrl?: string;
   videoTitle?: string;
+  productVideoUrl?: string;
+  productVideoTitle?: string;
   campaignPrice?: number;
   comparePrice?: number;
   whySections?: WhySection[];

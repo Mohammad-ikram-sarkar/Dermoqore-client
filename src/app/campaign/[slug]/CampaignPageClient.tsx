@@ -36,6 +36,7 @@ import SkinConcernsSection from "@/components/campaign/SkinConcernsSection";
 import Realface from "@/components/home/Realface";
 import IngredientSpotlight from "@/components/home/IngredientSpotlight";
 import CampaignRealface from "@/components/campaign/CampaignRealface";
+import VideoSection from "@/components/campaign/Videoapi";
 import TrustBadges from "@/components/campaign/TrustBadges";
 
 function getYouTubeId(url: string) {
@@ -114,6 +115,7 @@ export default function CampaignPageClient({ campaign }: Props) {
   const ctaText = campaign.ctaText ?? "Order Now";
   const phone = campaign.phoneNumber;
   const videoId = campaign.videoUrl ? getYouTubeId(campaign.videoUrl) : null;
+  const productVideoId = campaign.productVideoUrl ? getYouTubeId(campaign.productVideoUrl) : null;
 
   // capture narrowed, non-empty optional arrays once (so callbacks keep the type)
   const whySections = campaign.whySections?.length ? campaign.whySections : null;
@@ -252,6 +254,12 @@ export default function CampaignPageClient({ campaign }: Props) {
           heading={campaign.skinConcernsHeading ?? "এই সমস্যাগুলোর কি আপনিও ভুগছেন?"}
         />
       </section>
+       {campaign.productVideoUrl && (
+        <VideoSection
+          videoUrl={campaign.productVideoUrl}
+          videoTitle={campaign.productVideoTitle ?? "Product Details"}
+        />
+      )}
 
       {/* ── Ingredient Spotlight ──────────────────────────────────────────── */}
       <IngredientSpotlight />
@@ -277,39 +285,11 @@ export default function CampaignPageClient({ campaign }: Props) {
       {/* ── Real Results section ───────────────────────────────────────────── */}
       <CampaignRealface customerReviews={campaign.customerReviews} />
 
+      {/* ── Product Details Video ──────────────────────────────────────────── */}
+     
+
       {/* ── Video section ──────────────────────────────────────────────────── */}
-      {videoId && (
-        <section className="py-14">
-          <div className="mx-auto max-w-7xl px-4 text-center">
-            {campaign.videoTitle && (
-              <h2 className="mb-2 text-3xl font-bold tracking-tight">{campaign.videoTitle}</h2>
-            )}
-            <p className={campaign.videoTitle ? "mb-8 text-sm text-muted-foreground" : "mb-8 hidden"}>
-              See it in action
-            </p>
-            <div className="overflow-hidden rounded-[10px] shadow-xl ring-1 ring-border">
-              <div className="relative aspect-video w-full">
-                <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title={campaign.videoTitle ?? campaign.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 h-full w-full"
-                />
-              </div>
-            </div>
-            <div className="mt-6">
-              <button
-                onClick={scrollToForm}
-                className="inline-flex items-center gap-2 rounded-[5px] px-8 py-2 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02]"
-                style={{ background: "var(--cp, #171717)" }}
-              >
-                {ctaText} <ArrowRight className="size-4" />
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
+    
           {/* ── BTRI Lab Test Report section ──────────────────────────────────── */}
       {campaign.labReportImages && campaign.labReportImages.length > 0 && (
         <section className="py-10 px-4">

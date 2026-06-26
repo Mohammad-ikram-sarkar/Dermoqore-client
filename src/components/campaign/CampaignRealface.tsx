@@ -213,6 +213,18 @@ export default function CampaignRealface({ customerReviews }: Props) {
                     {r.name}
                   </p>
 
+                  {r.videoTitle && (
+                    <p className="text-[0.7rem] font-medium text-[#1a1209] leading-tight">
+                      {r.videoTitle}
+                    </p>
+                  )}
+
+                  {r.videoDescription && (
+                    <p className="text-[0.65rem] text-[#5a5047] leading-snug">
+                      {r.videoDescription}
+                    </p>
+                  )}
+
                   {r.title && (
                     <p className="text-[0.65rem] text-[#5a5047] leading-snug">
                       {r.title}
