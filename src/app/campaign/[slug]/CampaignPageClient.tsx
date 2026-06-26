@@ -38,6 +38,7 @@ import IngredientsSection from "@/components/campaign/IngredientsSection";
 import SkinConcernsSection from "@/components/campaign/SkinConcernsSection";
 import Realface from "@/components/home/Realface";
 import IngredientSpotlight from "@/components/home/IngredientSpotlight";
+import CampaignHero from "@/components/campaign/CampaignHero";
 import CampaignRealface from "@/components/campaign/CampaignRealface";
 import VideoSection from "@/components/campaign/Videoapi";
 import TrustBadges from "@/components/campaign/TrustBadges";
@@ -161,87 +162,16 @@ export default function CampaignPageClient({ campaign }: Props) {
         </div>
       </header>
 
-      {/* ── Hero section (full‑width banner like home page) ─────────────────── */}
-<section className="w-full bg-secondary">
-  <div className="mx-auto grid min-h-[550px] max-w-[1400px] grid-cols-1 md:grid-cols-2">
-
-    {/* LEFT SIDE */}
-    <div className="flex items-center px-6 py-10 md:px-10 lg:px-14">
-      <div className="max-w-xl">
-
-        {campaign.offerBadge && (
-          <span
-            className="inline-flex items-center gap-1 rounded-[5px] px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow"
-            style={{ background: "var(--cp, #059669)" }}
-          >
-            {campaign.offerBadge}
-          </span>
-        )}
-
-        {/* Title */}
-        <h1 className="mt-4 whitespace-pre-line text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
-          {campaign.title}
-        </h1>
-
-        {/* Subtitle */}
-        {campaign.subtitle && (
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
-            {campaign.subtitle}
-          </p>
-        )}
-
-        {/* PRICE SECTION (kept) */}
-        <div className="mt-6 flex flex-wrap items-baseline gap-3">
-          {comparePrice && (
-            <span className="text-lg text-muted-foreground line-through md:text-xl">
-              {formatPrice(comparePrice)}
-            </span>
-          )}
-
-          <span className="text-3xl font-bold text-foreground md:text-5xl">
-            {formatPrice(campaignPrice)}
-          </span>
-
-          {comparePrice && (
-            <span
-              className="rounded-[5px] px-3 py-1 text-xs font-bold text-white sm:text-sm"
-              style={{ background: "var(--cp, #059669)" }}
-            >
-              {discount}% OFF
-            </span>
-          )}
-        </div>
-
-        {/* BUTTON */}
-        <div className="mt-6">
-          <button
-            onClick={scrollToForm}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] bg-foreground px-8 text-xs font-bold uppercase tracking-[0.12em] text-background transition-opacity hover:opacity-80"
-          >
-            <ShoppingCart className="size-4" />
-            {ctaText}
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    {/* RIGHT SIDE FULL HEIGHT IMAGE */}
-    <div className="h-[320px] md:h-full">
-      {primaryImage && (
-        <img
-          src={primaryImage}
-          alt={campaign.title}
-          className="h-full w-full object-cover"
-        />
-      )}
-    </div>
-
-  </div>
-
-  <TrustBadgeStrip />
-</section>
-
+      {/* ── Hero section ─────────────────────────────────────────────────────── */}
+      <CampaignHero
+        campaign={campaign}
+        comparePrice={comparePrice}
+        campaignPrice={campaignPrice}
+        discount={discount}
+        ctaText={ctaText}
+        primaryImage={primaryImage}
+        scrollToForm={scrollToForm}
+      />
 
       {/* ── Dynamic Features section (admin-controlled) ──────────────────────── */}
       {/* {campaign.features && campaign.features.length > 0 && (
