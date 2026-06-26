@@ -35,6 +35,8 @@ import IngredientsSection from "@/components/campaign/IngredientsSection";
 import SkinConcernsSection from "@/components/campaign/SkinConcernsSection";
 import Realface from "@/components/home/Realface";
 import IngredientSpotlight from "@/components/home/IngredientSpotlight";
+import CampaignRealface from "@/components/campaign/CampaignRealface";
+import TrustBadges from "@/components/campaign/TrustBadges";
 
 function getYouTubeId(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
@@ -273,7 +275,7 @@ export default function CampaignPageClient({ campaign }: Props) {
       )}
 
       {/* ── Real Results section ───────────────────────────────────────────── */}
-      <Realface />
+      <CampaignRealface customerReviews={campaign.customerReviews} />
 
       {/* ── Video section ──────────────────────────────────────────────────── */}
       {videoId && (
@@ -304,6 +306,78 @@ export default function CampaignPageClient({ campaign }: Props) {
               >
                 {ctaText} <ArrowRight className="size-4" />
               </button>
+            </div>
+          </div>
+        </section>
+      )}
+          {/* ── BTRI Lab Test Report section ──────────────────────────────────── */}
+      {campaign.labReportImages && campaign.labReportImages.length > 0 && (
+        <section className="py-10 px-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="flex flex-col gap-6 rounded-2xl bg-[#eef1fa] px-6 py-8 sm:flex-row sm:items-center sm:gap-10 sm:px-10">
+
+              {/* Left — text */}
+              <div className="flex-1 space-y-3">
+                <h2 className="text-xl font-bold text-[#1a2466]">
+                  {campaign.labReportTitle ?? "BTRI Lab Test Report"}
+                </h2>
+                {campaign.labReportDescription && (
+                  <p className="text-sm leading-relaxed text-[#3a4a7a]">
+                    {campaign.labReportDescription}
+                  </p>
+                )}
+                {campaign.labReportButtonUrl ? (
+                  <a
+                    href={campaign.labReportButtonUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-[6px] bg-[#1a2466] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
+                  >
+                    {campaign.labReportButtonText ?? "সম্পূর্ণ রিপোর্ট দেখুন"}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                ) : (
+                  <span className="inline-flex items-center gap-2 rounded-[6px] bg-[#1a2466] px-5 py-2.5 text-sm font-bold text-white">
+                    {campaign.labReportButtonText ?? "সম্পূর্ণ রিপোর্ট দেখুন"}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                )}
+              </div>
+
+              {/* Right — report images + BTRI stamp */}
+              <div className="relative flex shrink-0 items-end gap-2 sm:gap-3">
+                {campaign.labReportImages.map((url, i) => (
+                  <div
+                    key={i}
+                    className="relative overflow-hidden rounded-lg border border-white/60 bg-white shadow-md"
+                    style={{
+                      width: i === 0 ? "90px" : i === 1 ? "80px" : "75px",
+                      height: i === 0 ? "118px" : i === 1 ? "108px" : "100px",
+                      marginBottom: i === 0 ? "0px" : i === 1 ? "8px" : "16px",
+                    }}
+                  >
+                    <img
+                      src={url}
+                      alt={`Lab report ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ))}
+
+                {/* BTRI TESTED stamp — overlaid on last image */}
+                <div
+                  className="absolute -bottom-2 -right-2 flex h-16 w-16 flex-col items-center justify-center rounded-full border-2 border-[#3a4aaa] bg-white shadow-lg sm:h-[72px] sm:w-[72px]"
+                  style={{ rotate: "-12deg" }}
+                >
+                  <span className="text-[9px] font-extrabold leading-none tracking-wide text-[#1a2466]">BTRI</span>
+                  <span className="text-[8px] font-bold leading-none tracking-widest text-[#1a2466]">TESTED</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -414,9 +488,7 @@ export default function CampaignPageClient({ campaign }: Props) {
       )} */}
 
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
-      {campaign.testimonials && campaign.testimonials.length > 0 && (
-        <TestimonialsSection testimonials={campaign.testimonials} />
-      )}
+     
 
       {/* ── Key Benefits section ──────────────────────────────────────────── */}
       {/* {campaign.benefits && campaign.benefits.length > 0 && (
@@ -452,6 +524,9 @@ export default function CampaignPageClient({ campaign }: Props) {
       {campaign.ingredients && campaign.ingredients.length > 0 && (
         <IngredientsSection ingredients={campaign.ingredients} />
       )}
+     
+  
+      <TrustBadges />
 
 
       <div className="mb-[-70px]" style={{ background: "#1a2466" }}>

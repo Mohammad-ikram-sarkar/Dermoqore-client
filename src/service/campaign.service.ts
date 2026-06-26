@@ -22,6 +22,12 @@ export interface Testimonial {
   text: string;
 }
 
+export interface CustomerReview {
+  name: string;
+  title?: string;
+  videoUrl: string;
+}
+
 export interface Feature {
   title: string;
   description: string;
@@ -72,12 +78,18 @@ export interface Campaign {
   whySections?: WhySection[];
   benefits?: string[];
   testimonials?: Testimonial[];
+  customerReviews?: CustomerReview[];
   included?: string[];
   features?: Feature[];
   skinConcerns?: SkinConcern[];
   skinConcernsHeading?: string;
   ingredients?: Ingredient[];
   faqs?: FaqItem[];
+  labReportTitle?: string;
+  labReportDescription?: string;
+  labReportButtonText?: string;
+  labReportButtonUrl?: string;
+  labReportImages?: string[];
   theme: CampaignTheme;
   offerBadge?: string;
   ctaText?: string;
