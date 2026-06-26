@@ -8,9 +8,12 @@ import {
   ShoppingCart,
   Star,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   CheckCheck,
   ArrowRight,
+  X,
   Leaf,
   Droplets,
   ShieldCheck,
@@ -38,6 +41,7 @@ import IngredientSpotlight from "@/components/home/IngredientSpotlight";
 import CampaignRealface from "@/components/campaign/CampaignRealface";
 import VideoSection from "@/components/campaign/Videoapi";
 import TrustBadges from "@/components/campaign/TrustBadges";
+import { TrustBadgeStrip } from "@/components/campaign/TrustBadgeStrip";
 
 function getYouTubeId(url: string) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
@@ -93,6 +97,7 @@ interface Props {
 export default function CampaignPageClient({ campaign }: Props) {
   const formRef = useRef<HTMLDivElement>(null);
   const scrollToForm = () => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const [reportViewer, setReportViewer] = useState<{ open: boolean; page: number }>({ open: false, page: 0 });
 
   const campaignPrice = campaign.campaignPrice
     ? Number(campaign.campaignPrice)
@@ -157,72 +162,85 @@ export default function CampaignPageClient({ campaign }: Props) {
       </header>
 
       {/* ── Hero section (full‑width banner like home page) ─────────────────── */}
-      <section className="relative w-full overflow-hidden bg-secondary">
-        <div className="relative h-[400px] w-full sm:h-[480px] md:h-[520px] lg:h-[550px]">
-          <div className="absolute inset-0">
-            {primaryImage ? (
-              <img
-                src={primaryImage}
-                alt={campaign.title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-            ) : null}
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/5 md:via-background/55" />
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
-          </div>
+<section className="w-full bg-secondary">
+  <div className="mx-auto grid min-h-[550px] max-w-[1400px] grid-cols-1 md:grid-cols-2">
 
-          <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 py-5 sm:px-8 sm:py-8 md:px-10 md:py-10 lg:py-14">
-            <div className="max-w-xl">
-              {campaign.offerBadge && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-[5px] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow sm:gap-1.5 sm:px-4 sm:py-1.5 sm:text-xs"
-                  style={{ background: "var(--cp, #059669)" }}
-                >
-                  {campaign.offerBadge}
-                </span>
-              )}
-              <h1 className="mt-1.5 max-w-lg whitespace-pre-line text-2xl font-bold leading-tight text-foreground sm:mt-3 sm:text-4xl md:text-5xl md:leading-[0.98] lg:text-6xl">
-                {campaign.title}
-              </h1>
-              {campaign.subtitle && (
-                <p className="mt-2 max-w-md text-[11px] font-medium leading-relaxed text-muted-foreground sm:mt-4 sm:text-sm md:mt-5 md:text-base">
-                  {campaign.subtitle}
-                </p>
-              )}
+    {/* LEFT SIDE */}
+    <div className="flex items-center px-6 py-10 md:px-10 lg:px-14">
+      <div className="max-w-xl">
 
-              {/* Pricing */}
-              <div className="mt-3 flex flex-wrap items-baseline gap-1.5 sm:mt-5 sm:gap-3 md:mt-6">
-                {comparePrice && (
-                  <span className="text-base text-muted-foreground line-through sm:text-xl">
-                    {formatPrice(comparePrice)}
-                  </span>
-                )}
-                <span className="text-2xl font-bold text-foreground sm:text-4xl md:text-5xl">
-                  {formatPrice(campaignPrice)}
-                </span>
-                {comparePrice && (
-                  <span
-                    className="rounded-[5px] px-1.5 py-0.5 text-[10px] font-bold text-white sm:px-3 sm:py-1 sm:text-sm"
-                    style={{ background: "var(--cp, #059669)" }}
-                  >
-                    {discount}% OFF
-                  </span>
-                )}
-              </div>
+        {campaign.offerBadge && (
+          <span
+            className="inline-flex items-center gap-1 rounded-[5px] px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow"
+            style={{ background: "var(--cp, #059669)" }}
+          >
+            {campaign.offerBadge}
+          </span>
+        )}
 
-              <div className="mt-3 flex flex-wrap gap-2 sm:mt-5 sm:gap-3 md:mt-6">
-                <button
-                  onClick={scrollToForm}
-                  className="inline-flex h-9 items-center justify-center gap-1 rounded-[5px] bg-foreground px-5 text-[9px] font-bold tracking-[0.12em] text-background uppercase transition-opacity hover:opacity-80 sm:h-11 sm:px-8 sm:text-[11px] sm:gap-2"
-                >
-                  <ShoppingCart className="size-2.5 sm:size-4" />
-                  {ctaText}
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Title */}
+        <h1 className="mt-4 whitespace-pre-line text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
+          {campaign.title}
+        </h1>
+
+        {/* Subtitle */}
+        {campaign.subtitle && (
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+            {campaign.subtitle}
+          </p>
+        )}
+
+        {/* PRICE SECTION (kept) */}
+        <div className="mt-6 flex flex-wrap items-baseline gap-3">
+          {comparePrice && (
+            <span className="text-lg text-muted-foreground line-through md:text-xl">
+              {formatPrice(comparePrice)}
+            </span>
+          )}
+
+          <span className="text-3xl font-bold text-foreground md:text-5xl">
+            {formatPrice(campaignPrice)}
+          </span>
+
+          {comparePrice && (
+            <span
+              className="rounded-[5px] px-3 py-1 text-xs font-bold text-white sm:text-sm"
+              style={{ background: "var(--cp, #059669)" }}
+            >
+              {discount}% OFF
+            </span>
+          )}
         </div>
-      </section>
+
+        {/* BUTTON */}
+        <div className="mt-6">
+          <button
+            onClick={scrollToForm}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-[5px] bg-foreground px-8 text-xs font-bold uppercase tracking-[0.12em] text-background transition-opacity hover:opacity-80"
+          >
+            <ShoppingCart className="size-4" />
+            {ctaText}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    {/* RIGHT SIDE FULL HEIGHT IMAGE */}
+    <div className="h-[320px] md:h-full">
+      {primaryImage && (
+        <img
+          src={primaryImage}
+          alt={campaign.title}
+          className="h-full w-full object-cover"
+        />
+      )}
+    </div>
+
+  </div>
+
+  <TrustBadgeStrip />
+</section>
 
 
       {/* ── Dynamic Features section (admin-controlled) ──────────────────────── */}
@@ -293,8 +311,8 @@ export default function CampaignPageClient({ campaign }: Props) {
           {/* ── BTRI Lab Test Report section ──────────────────────────────────── */}
       {campaign.labReportImages && campaign.labReportImages.length > 0 && (
         <section className="py-10 px-4">
-          <div className="mx-auto max-w-5xl">
-            <div className="flex flex-col gap-6 rounded-2xl bg-[#eef1fa] px-6 py-8 sm:flex-row sm:items-center sm:gap-10 sm:px-10">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex flex-col gap-6 rounded-[5px] bg-[#eef1fa] px-6 py-8 sm:flex-row sm:items-center sm:gap-10 sm:px-10">
 
               {/* Left — text */}
               <div className="flex-1 space-y-3">
@@ -306,26 +324,15 @@ export default function CampaignPageClient({ campaign }: Props) {
                     {campaign.labReportDescription}
                   </p>
                 )}
-                {campaign.labReportButtonUrl ? (
-                  <a
-                    href={campaign.labReportButtonUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-[6px] bg-[#1a2466] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
-                  >
-                    {campaign.labReportButtonText ?? "সম্পূর্ণ রিপোর্ট দেখুন"}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </a>
-                ) : (
-                  <span className="inline-flex items-center gap-2 rounded-[6px] bg-[#1a2466] px-5 py-2.5 text-sm font-bold text-white">
-                    {campaign.labReportButtonText ?? "সম্পূর্ণ রিপোর্ট দেখুন"}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </span>
-                )}
+                <button
+                  onClick={() => setReportViewer({ open: true, page: 0 })}
+                  className="inline-flex items-center gap-2 rounded-[6px] bg-[#1a2466] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
+                >
+                  {campaign.labReportButtonText ?? "সম্পূর্ণ রিপোর্ট দেখুন"}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
               </div>
 
               {/* Right — report images + BTRI stamp */}
@@ -333,7 +340,7 @@ export default function CampaignPageClient({ campaign }: Props) {
                 {campaign.labReportImages.map((url, i) => (
                   <div
                     key={i}
-                    className="relative overflow-hidden rounded-lg border border-white/60 bg-white shadow-md"
+                    className="relative overflow-hidden rounded-[5px] border border-white/60 bg-white shadow-md"
                     style={{
                       width: i === 0 ? "90px" : i === 1 ? "80px" : "75px",
                       height: i === 0 ? "118px" : i === 1 ? "108px" : "100px",
@@ -361,6 +368,58 @@ export default function CampaignPageClient({ campaign }: Props) {
             </div>
           </div>
         </section>
+      )}
+
+      {/* ── Report Viewer Modal ────────────────────────────────────────── */}
+      {reportViewer.open && campaign.labReportImages && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4">
+          <div className="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b px-6 py-4">
+              <h3 className="text-lg font-bold text-[#1a2466]">
+                {campaign.labReportTitle ?? "BTRI Lab Test Report"}
+              </h3>
+              <button
+                onClick={() => setReportViewer({ open: false, page: 0 })}
+                className="rounded-full p-1.5 hover:bg-muted transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Image page */}
+            <div className="relative flex items-center justify-center bg-[#f5f5f5] min-h-[60vh] p-6">
+              {campaign.labReportImages.length > 0 && (
+                <img
+                  src={campaign.labReportImages[reportViewer.page]}
+                  alt={`Report page ${reportViewer.page + 1}`}
+                  className="max-h-[70vh] w-auto object-contain rounded-lg shadow-md"
+                />
+              )}
+            </div>
+
+            {/* Footer / pagination */}
+            <div className="flex items-center justify-between border-t px-6 py-4">
+              <button
+                disabled={reportViewer.page === 0}
+                onClick={() => setReportViewer((p) => ({ ...p, page: p.page - 1 }))}
+                className="flex items-center gap-1 rounded-md bg-[#1a2466] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              >
+                <ChevronLeft size={16} /> Previous
+              </button>
+              <span className="text-sm font-medium text-[#1a2466]">
+                Page {reportViewer.page + 1} of {campaign.labReportImages.length}
+              </span>
+              <button
+                disabled={reportViewer.page === campaign.labReportImages.length - 1}
+                onClick={() => setReportViewer((p) => ({ ...p, page: p.page + 1 }))}
+                className="flex items-center gap-1 rounded-md bg-[#1a2466] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── FAQ + Order Form — side-by-side layout ─────────────────────────── */}

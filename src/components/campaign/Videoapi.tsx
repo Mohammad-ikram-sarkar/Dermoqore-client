@@ -97,11 +97,11 @@ export default function VideoSection({
 
   return (
     <section className="py-12 px-4 md:px-8 bg-white">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
 
         {/* Left — Video */}
         <div>
-          <div className="relative rounded-2xl overflow-hidden bg-gray-100 aspect-video shadow-sm">
+          <div className="relative rounded-[10px] overflow-hidden bg-gray-100 aspect-video shadow-sm">
             {playing && videoId ? (
               <iframe
                 className="absolute inset-0 w-full h-full"
@@ -166,8 +166,8 @@ export default function VideoSection({
         </div>
 
         {/* Right — Features */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+        <div >
+          <h2 className="text-xl font-semibold text-gray-900 mt-[-60px] ml-10 pb-10">
             Dermoqore কেন আলাদা?
           </h2>
           <div className="grid grid-cols-3 gap-5">
