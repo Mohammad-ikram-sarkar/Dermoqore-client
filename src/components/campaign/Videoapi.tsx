@@ -2,92 +2,109 @@
 
 import { useState } from "react";
 
+const NAVY = "#1a2466";
+const S = NAVY; // stroke color shorthand
+
 const FEATURES = [
   {
     id: "science",
-    label: "Science-Based Formula",
+    label: "Science-Based\nFormula",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 3h6v7l3 9H6l3-9V3z" />
-        <path d="M6 6h12" />
+      /* Three circles connected in a triangular molecule */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="7"  r="4" stroke={S} strokeWidth="1.5" />
+        <circle cx="7"  cy="22" r="4" stroke={S} strokeWidth="1.5" />
+        <circle cx="23" cy="22" r="4" stroke={S} strokeWidth="1.5" />
+        <line x1="15" y1="11" x2="7"  y2="18" stroke={S} strokeWidth="1.4" />
+        <line x1="15" y1="11" x2="23" y2="18" stroke={S} strokeWidth="1.4" />
+        <line x1="11" y1="22" x2="19" y2="22" stroke={S} strokeWidth="1.4" />
       </svg>
     ),
-    blocked: false,
   },
   {
     id: "transparency",
-    label: "Ingredient Transparency",
+    label: "Ingredient\nTransparency",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-        <circle cx="12" cy="12" r="3" />
+      /* Circle with X cross inside — ⊗ */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="10" stroke={S} strokeWidth="1.5" />
+        <line x1="8.5"  y1="8.5"  x2="21.5" y2="21.5" stroke={S} strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="21.5" y1="8.5"  x2="8.5"  y2="21.5" stroke={S} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
-    blocked: false,
   },
   {
     id: "steroid",
     label: "No Steroid",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="9" width="16" height="6" rx="3" />
-        <path d="M8 9V7m8 2V7" />
+      /* Circle with diagonal slash — ⊘ / prohibition */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="10" stroke={S} strokeWidth="1.5" />
+        <line x1="8.5" y1="8.5" x2="21.5" y2="21.5" stroke={S} strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="21.5" y1="8.5" x2="8.5"  y2="21.5" stroke={S} strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="15" cy="15" r="4.5" stroke={S} strokeWidth="1.2" />
       </svg>
     ),
-    blocked: true,
   },
   {
     id: "fragrance",
-    label: "Fragrance Free",
+    label: "Fragrance\nFree",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2c0 0-4 3-4 7s4 7 4 7 4-3 4-7-4-7-4-7z" />
-        <path d="M8 18h8" />
-        <path d="M10 21h4" />
+      /* 6-petal flower / asterisk */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        {/* 6 petals via ellipses rotated around center */}
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" />
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" transform="rotate(60 15 15)" />
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" transform="rotate(120 15 15)" />
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" transform="rotate(180 15 15)" />
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" transform="rotate(240 15 15)" />
+        <ellipse cx="15" cy="9"  rx="2.5" ry="4.5" stroke={S} strokeWidth="1.4" transform="rotate(300 15 15)" />
+        <circle cx="15" cy="15" r="2.5" stroke={S} strokeWidth="1.4" />
       </svg>
     ),
-    blocked: true,
   },
   {
     id: "gentle",
-    label: "Gentle & Safe for Skin",
+    label: "Gentle & Safe\nfor Skin",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 21C12 21 4 14 4 8.5a4.5 4.5 0 0 1 8-2.83A4.5 4.5 0 0 1 20 8.5C20 14 12 21 12 21z" />
+      /* Pear / water-drop outline */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path
+          d="M15 5 C15 5 9 10 9 17 C9 21.4 11.6 24.5 15 24.5 C18.4 24.5 21 21.4 21 17 C21 10 15 5 15 5Z"
+          stroke={S} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        />
+        <path d="M12.5 19.5 C12.5 19.5 11 17.5 11.5 15" stroke={S} strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
       </svg>
     ),
-    blocked: false,
   },
   {
     id: "bangladesh",
-    label: "Made in Bangladesh",
+    label: "Made in\nBangladesh",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        <path d="M2 12h20" />
+      /* Shield with small inner circle */
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path
+          d="M15 5 L24 9 L24 17 C24 22 20 25.5 15 27.5 C10 25.5 6 22 6 17 L6 9 Z"
+          stroke={S} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        />
+        <circle cx="15" cy="16" r="4.5" stroke={S} strokeWidth="1.3" />
       </svg>
     ),
-    blocked: false,
   },
 ];
 
 interface VideoSectionProps {
   videoUrl?: string;
-  videoTitle?: string;
 }
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
   );
   return match ? match[1] : null;
 }
 
-export default function VideoSection({
-  videoUrl = "",
-  videoTitle = "২ মিনিটে জানুন কেন Dermoqore আলাদা?",
-}: VideoSectionProps) {
+export default function VideoSection({ videoUrl = "" }: VideoSectionProps) {
   const [playing, setPlaying] = useState(false);
 
   const videoId = videoUrl ? getYouTubeId(videoUrl) : null;
@@ -96,102 +113,82 @@ export default function VideoSection({
     : null;
 
   return (
-    <section className="py-12 px-4 md:px-8 bg-white">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <section className="bg-background px-4 pt-12 md:pt-8">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-10 rounded-2xl bg-[#f3f6fc] px-8 py-10 md:grid-cols-2 md:gap-14">
 
-        {/* Left — Video */}
+        {/* ── Left: Video ─────────────────────────────────────────── */}
         <div>
-          <div className="relative rounded-[10px] overflow-hidden bg-gray-100 aspect-video shadow-sm">
+          <div className="relative aspect-video overflow-hidden rounded-[12px] bg-[#dce3f0] shadow-md">
             {playing && videoId ? (
               <iframe
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 h-full w-full"
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                title={videoTitle}
+                title="Campaign video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             ) : (
               <>
                 {thumbnailUrl ? (
-                  <img
-                    src={thumbnailUrl}
-                    alt={videoTitle}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={thumbnailUrl} alt="Video thumbnail" className="h-full w-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-[#e8f0ea] flex items-center justify-center">
-                    <span className="text-[#2d7a3a] text-sm font-medium opacity-50">
-                      No video added
-                    </span>
+                  <div className="flex h-full w-full items-center justify-center">
+                    <span className="text-sm font-medium opacity-40" style={{ color: NAVY }}>No video added</span>
                   </div>
                 )}
 
-                {/* Play button */}
                 <button
                   onClick={() => videoId && setPlaying(true)}
                   disabled={!videoId}
                   aria-label="Play video"
-                  className="absolute inset-0 flex items-center justify-center group"
+                  className="group absolute inset-0 flex items-center justify-center"
                 >
-                  <span className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-md transition-transform group-hover:scale-105 group-active:scale-95 disabled:opacity-40">
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="#2d7a3a"
-                      className="ml-1"
-                    >
+                  <span className="flex h-[56px] w-[56px] items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform group-hover:scale-105 group-active:scale-95">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill={NAVY} className="ml-1">
                       <polygon points="5,3 19,12 5,21" />
                     </svg>
                   </span>
                 </button>
 
-                {/* Duration badge */}
-                <span className="absolute bottom-3 right-3 text-xs text-white bg-black/70 px-2 py-0.5 rounded font-medium">
+                <span className="absolute bottom-3 right-3 rounded-[4px] bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white">
                   2:15
                 </span>
               </>
             )}
           </div>
 
-          {/* Caption */}
           <div className="mt-4 text-center">
-            <p className="text-[15px] font-semibold text-gray-800 leading-snug">
-              {videoTitle}
+            <p className="text-[16px] font-bold leading-snug" style={{ color: "#1a1a1a" }}>
+              2 মিনিটে জানুন<br />কেন Dermoqore আলাদা?
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="mt-1.5 text-xs text-gray-400">
               Founder-এর কাছ থেকে সরাসরি শুনুন
             </p>
           </div>
         </div>
 
-        {/* Right — Features */}
-        <div >
-          <h2 className="text-xl font-semibold text-gray-900 mt-[-60px] ml-10 pb-10">
+        {/* ── Right: Why Different ────────────────────────────────── */}
+        <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-sm">
+          <h2 className="mb-7 text-[22px] font-bold sm:text-2xl" style={{ color: NAVY }}>
             Dermoqore কেন আলাদা?
           </h2>
-          <div className="grid grid-cols-3 gap-5">
+
+          <div className="grid grid-cols-3 gap-x-4 gap-y-8">
             {FEATURES.map((feat) => (
-              <div key={feat.id} className="flex flex-col items-center gap-2">
-                <div className="relative w-[52px] h-[52px] rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-500">
+              <div key={feat.id} className="flex flex-col items-center gap-3 text-center">
+                <div
+                  className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    background: "#edf0fb",
+                    border: "1.5px solid #b8c4e4",
+                  }}
+                >
                   {feat.icon}
-                  {feat.blocked && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 border-white bg-red-100 flex items-center justify-center">
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 10 10"
-                        fill="none"
-                        stroke="#c0392b"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      >
-                        <path d="M2 2l6 6M8 2l-6 6" />
-                      </svg>
-                    </span>
-                  )}
                 </div>
-                <span className="text-[11px] text-gray-500 text-center leading-tight font-medium">
+                <span
+                  className="whitespace-pre-line text-[11.5px] font-medium leading-tight"
+                  style={{ color: "#374270" }}
+                >
                   {feat.label}
                 </span>
               </div>

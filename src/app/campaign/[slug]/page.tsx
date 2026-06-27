@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CampaignService } from "@/service/campaign.service";
-import { FooterServer } from "@/components/footer/FooterServer";
 import CampaignPageClient from "./CampaignPageClient";
 
 type Params = Promise<{ slug: string }>;

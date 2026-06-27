@@ -113,9 +113,9 @@ export default function TrustBadges() {
     <section className="w-full bg-white py-10 px-4 border-y border-gray-100">
       <div className="max-w-4xl mx-auto">
         {/* Heading */}
-        <h2 className="text-center text-gray-800 text-lg md:text-xl font-semibold mb-8 leading-snug">
+        <h2 className="mb-8 text-center text-lg font-semibold leading-snug text-[#1a2466] md:text-xl">
           কেন হাজারো মানুষের ভরসা{" "}
-          <span className="text-[#2d7a3a] font-bold">Dermoqore?</span>
+          <span className="font-bold text-[#1a2466]">Dermoqore?</span>
         </h2>
 
         {/* Badges */}

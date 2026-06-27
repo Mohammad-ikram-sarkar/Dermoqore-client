@@ -1,245 +1,188 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-
+import { useState } from "react";
+import { Play, Star, ArrowRight } from "lucide-react";
 import type { CustomerReview } from "@/service/campaign.service";
+
+const NAVY = "#1a2466";
+const CARD_BG = "#edf0fb";
 
 interface Props {
   customerReviews?: CustomerReview[];
 }
 
-const beforeAfterPairs = [
-  { id: 1, before: "/before1.png", after: "/after.png" },
-  { id: 2, before: "/before.png", after: "/after.png" },
-  { id: 3, before: "/before2.png", after: "/after2.png" },
+const RESULTS = [
+  { before: "/before1.png", after: "/after.png",  week: "4 Weeks" },
+  { before: "/before.png",  after: "/after.png",  week: "6 Weeks" },
+  { before: "/before2.png", after: "/after2.png", week: "8 Weeks" },
 ];
 
+const INITIAL_REVIEWS = 3;
+
 function getYouTubeId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]+)/,
-    /(?:youtu\.be\/)([a-zA-Z0-9_-]+)/,
-    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
-    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/,
-  ];
-  for (const p of patterns) {
-    const m = url.match(p);
-    if (m) return m[1];
-  }
-  return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
 
-function getYouTubeEmbedUrl(url: string): string | null {
-  const id = getYouTubeId(url);
-  return id ? `https://www.youtube.com/embed/${id}` : null;
+function Stars() {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} className="size-3 fill-amber-400 text-amber-400" />
+      ))}
+    </div>
+  );
 }
 
-function getYouTubeThumbnail(url: string): string | null {
-  const id = getYouTubeId(url);
-  return id ? `https://img.youtube.com/vi/${id}/maxresdefault.jpg` : null;
+function BeforeAfter({ before, after, week }: (typeof RESULTS)[number]) {
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div className="flex w-full gap-0.5 overflow-hidden rounded-md">
+        <div className="relative flex-1">
+          <div className="aspect-[3/4] overflow-hidden bg-[#cdd5e8]">
+            <img src={before} alt="Before" className="h-full w-full object-cover object-top" />
+          </div>
+          <span className="absolute bottom-1 left-1 rounded-sm bg-black/50 px-1 py-px text-[7px] font-semibold uppercase text-white">
+            Before
+          </span>
+        </div>
+        <div className="relative flex-1">
+          <div className="aspect-[3/4] overflow-hidden bg-[#cdd5e8]">
+            <img src={after} alt="After" className="h-full w-full object-cover object-top" />
+          </div>
+          <span className="absolute bottom-1 right-1 rounded-sm bg-black/50 px-1 py-px text-[7px] font-semibold uppercase text-white">
+            After
+          </span>
+        </div>
+      </div>
+      <span className="text-[11px] font-semibold" style={{ color: NAVY }}>
+        {week}
+      </span>
+    </div>
+  );
 }
 
 export default function CampaignRealface({ customerReviews }: Props) {
-  const [index, setIndex] = useState(0);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
-  const prev = () =>
-    setIndex((i) => (i - 1 + beforeAfterPairs.length) % beforeAfterPairs.length);
-  const next = () =>
-    setIndex((i) => (i + 1) % beforeAfterPairs.length);
-
-  const current = beforeAfterPairs[index];
-  const next1 = beforeAfterPairs[(index + 1) % beforeAfterPairs.length];
+  const reviews = customerReviews ?? [];
+  const visible = showAll ? reviews : reviews.slice(0, INITIAL_REVIEWS);
 
   return (
-    <div className="flex items-center justify-center bg-[#f5f0eb] mb-2">
-      <section className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-stretch gap-10 py-6">
+    <section className="bg-white px-4 py-10 md:py-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5 md:flex-row md:items-stretch md:gap-6">
 
-        {/* LEFT: Before/After Carousel */}
-        <div className="flex-1 flex flex-col justify-center">
-          {/* Section title */}
-          <h2 className="text-center text-[#1a1209] font-semibold text-base mb-4">
+        {/* ── LEFT — বাস্তব ফলাফল ── */}
+        <div className="flex flex-1 flex-col rounded-2xl px-5 py-5" style={{ background: CARD_BG }}>
+          <h2 className="mb-4 text-center text-[15px] font-bold" style={{ color: NAVY }}>
             বাস্তব ফলাফল
           </h2>
 
-          <div className="relative flex items-center gap-3">
-            {/* Prev arrow */}
-            <button
-              onClick={prev}
-              aria-label="Previous"
-              className="shrink-0 w-8 h-8 flex items-center justify-center text-[#1a1209] hover:opacity-60 transition-opacity z-10"
-            >
-              <ChevronLeft size={22} strokeWidth={1.5} />
-            </button>
-
-            {/* Photo pairs */}
-            <div className="flex gap-3 flex-1 overflow-hidden">
-              {/* Pair 1 (current) */}
-              <div className="flex gap-1 flex-1">
-                <div className="flex-1 flex flex-col gap-1">
-                  <div className="bg-[#d9cfc7] aspect-[4/5] overflow-hidden rounded-sm">
-                    <img
-                      src={current.before}
-                      alt="Before treatment"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  <span className="text-[0.65rem] tracking-[0.14em] uppercase text-[#7a6f65] pt-1">
-                    Before
-                  </span>
-                </div>
-                <div className="flex-1 flex flex-col gap-1">
-                  <div className="bg-[#d9cfc7] aspect-[4/5] overflow-hidden rounded-sm">
-                    <img
-                      src={current.after}
-                      alt="After 4 weeks"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  <span className="text-[0.65rem] tracking-[0.14em] uppercase text-[#7a6f65] pt-1">
-                    After 4 Weeks
-                  </span>
-                </div>
-              </div>
-
-              {/* Pair 2 (peek) */}
-              <div className="flex gap-1 flex-1">
-                <div className="flex-1 flex flex-col gap-1">
-                  <div className="bg-[#d9cfc7] aspect-[4/5] overflow-hidden rounded-sm">
-                    <img
-                      src={next1.before}
-                      alt="Before treatment"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  <span className="text-[0.65rem] tracking-[0.14em] uppercase text-[#7a6f65] pt-1">
-                    Before
-                  </span>
-                </div>
-                <div className="flex-1 flex flex-col gap-1">
-                  <div className="bg-[#d9cfc7] aspect-[4/5] overflow-hidden rounded-sm">
-                    <img
-                      src={next1.after}
-                      alt="After 4 weeks"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  <span className="text-[0.65rem] tracking-[0.14em] uppercase text-[#7a6f65] pt-1">
-                    After 4 Weeks
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Next arrow */}
-            <button
-              onClick={next}
-              aria-label="Next"
-              className="shrink-0 w-8 h-8 flex items-center justify-center text-[#1a1209] hover:opacity-60 transition-opacity z-10"
-            >
-              <ChevronRight size={22} strokeWidth={1.5} />
-            </button>
+          <div className="grid grid-cols-3 gap-2.5">
+            {RESULTS.map((r) => (
+              <BeforeAfter key={r.week} {...r} />
+            ))}
           </div>
 
-          <p className="text-center text-[0.65rem] text-[#7a6f65] mt-3 tracking-wide">
+          <p className="mt-3 text-center text-[10.5px]" style={{ color: "#6b7a9e" }}>
             * ফলাফল ব্যক্তি ভেদে ভিন্ন হতে পারে
           </p>
         </div>
 
-        {/* Divider */}
-        <div className="hidden md:block w-px bg-[#d9cfc7] self-stretch" />
-
-        {/* RIGHT: Customer Video Testimonials */}
-        <div className="flex-1 flex flex-col justify-center">
-          {/* Section title */}
-          <h2 className="text-[#1a1209] font-semibold text-base mb-4">
+        {/* ── RIGHT — গ্রাহকরা যা বলেছেন ── */}
+        <div className="flex flex-1 flex-col rounded-2xl px-5 py-5" style={{ background: CARD_BG }}>
+          <h2 className="mb-4 text-[15px] font-bold" style={{ color: NAVY }}>
             গ্রাহকরা যা বলেছেন
           </h2>
 
-          {customerReviews && customerReviews.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3">
-              {customerReviews.map((r, i) => {
-                const embedUrl = getYouTubeEmbedUrl(r.videoUrl);
-                const thumb = getYouTubeThumbnail(r.videoUrl);
-                return (
-                <div key={i} className="flex flex-col gap-2">
-                  <div
-                    className="relative aspect-[3/4] overflow-hidden rounded-md bg-[#d9cfc7] cursor-pointer group"
-                    onClick={() => setPlayingUrl(r.videoUrl === playingUrl ? null : r.videoUrl)}
-                  >
-                    {playingUrl === r.videoUrl && embedUrl ? (
-                      <iframe
-                        src={embedUrl}
-                        className="w-full h-full"
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
-                      />
-                    ) : thumb ? (
-                      <>
-                        <img
-                          src={thumb}
-                          alt={r.name}
-                          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                            <Play
-                              size={16}
-                              className="text-[#1a1209] fill-[#1a1209] ml-0.5"
-                            />
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-full h-full bg-[#d9cfc7] flex items-center justify-center text-[#7a6f65] text-xs px-2 text-center">
-                          {r.title || r.name}
-                        </div>
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                            <Play
-                              size={16}
-                              className="text-[#1a1209] fill-[#1a1209] ml-0.5"
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
+          {reviews.length > 0 ? (
+            <>
+              <div className="grid grid-cols-3 gap-3">
+                {visible.map((r, i) => {
+                  const videoId = getYouTubeId(r.videoUrl);
+                  const embedUrl = videoId
+                    ? `https://www.youtube.com/embed/${videoId}?autoplay=1`
+                    : null;
+                  const thumb = videoId
+                    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                    : null;
+                  const desc = r.videoDescription || r.title;
 
-                  <p className="text-[0.75rem] font-semibold text-[#1a1209] leading-tight">
-                    {r.name}
-                  </p>
+                  return (
+                    <div key={i} className="flex flex-col gap-1.5">
+                      {/* Landscape thumbnail — matches ref ratio */}
+                      <div
+                        className="group relative aspect-video cursor-pointer overflow-hidden rounded-lg bg-[#cdd5e8]"
+                        onClick={() =>
+                          setPlayingUrl(r.videoUrl === playingUrl ? null : r.videoUrl)
+                        }
+                      >
+                        {playingUrl === r.videoUrl && embedUrl ? (
+                          <iframe
+                            src={embedUrl}
+                            className="h-full w-full"
+                            allow="autoplay; encrypted-media"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <>
+                            {thumb && (
+                              <img
+                                src={thumb}
+                                alt={r.name}
+                                className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-black/15 transition-colors group-hover:bg-black/25" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm transition-transform group-hover:scale-110">
+                                <Play size={13} className="ml-0.5 fill-[#1a2466] text-[#1a2466]" />
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
 
-                  {r.videoTitle && (
-                    <p className="text-[0.7rem] font-medium text-[#1a1209] leading-tight">
-                      {r.videoTitle}
-                    </p>
-                  )}
+                      <p className="text-[11.5px] font-semibold leading-tight" style={{ color: NAVY }}>
+                        {r.name}
+                      </p>
+                      <Stars />
+                      {desc && (
+                        <p className="text-[10px] leading-snug text-[#5a6488]">
+                          {desc}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
-                  {r.videoDescription && (
-                    <p className="text-[0.65rem] text-[#5a5047] leading-snug">
-                      {r.videoDescription}
-                    </p>
-                  )}
-
-                  {r.title && (
-                    <p className="text-[0.65rem] text-[#5a5047] leading-snug">
-                      {r.title}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-            </div>
+            </>
           ) : (
-            <p className="text-[0.75rem] text-[#7a6f65]">No reviews yet</p>
+            <p className="text-[12px]" style={{ color: "#6b7a9e" }}>এখনও কোনো রিভিউ নেই</p>
           )}
         </div>
 
-      </section>
-    </div>
+      </div>
+
+      {/* Button OUTSIDE both cards */}
+      {reviews.length > 0 && (
+        <div className="mx-auto mt-4 flex max-w-6xl gap-6">
+          <div className="flex-1" />
+          <div className="flex flex-1 justify-center">
+            <button
+              onClick={() => setShowAll((s) => !s)}
+              className="inline-flex items-center gap-2 rounded-full border border-[#1a2466]/25 bg-white px-5 py-2 text-[12px] font-semibold transition-colors hover:bg-[#edf0fb]"
+              style={{ color: NAVY }}
+            >
+              {showAll ? "কম দেখুন" : "আরও রিভিউ দেখুন"}
+              <ArrowRight className="size-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+    </section>
   );
 }
