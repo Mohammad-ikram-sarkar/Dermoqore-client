@@ -26,6 +26,17 @@ export const ProductService = {
     return res.json();
   },
 
+  /** Client-side safe search — no server-only fetch options. */
+  searchAll: async (
+    params: ProductListParams = {},
+    init?: RequestInit,
+  ): Promise<ProductListResponse> => {
+    const res = await fetch(`${BASE}/api/product?${buildQuery(params)}`, init);
+
+    if (!res.ok) throw new Error(`Failed to search products: ${res.status}`);
+    return res.json();
+  },
+
   findBestSellers: async (limit = 8): Promise<Product[]> => {
     const res = await fetch(`${BASE}/api/product/best-sellers?limit=${limit}`, {
       next: { revalidate: 60 },

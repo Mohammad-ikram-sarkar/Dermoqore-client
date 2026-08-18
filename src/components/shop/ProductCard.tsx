@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import type { Product, ProductImage } from "@/service/product.type";
 import { useCheckoutStore } from "@/store/checkout-store";
+import { useWishlistStore } from "@/store/wishlist-store";
+import { cn } from "@/lib/utils";
 
 function formatPrice(price: number | string) {
   return `৳${Number(price).toLocaleString("en-BD")}`;
@@ -29,6 +31,8 @@ export default function ProductCard({
 }) {
   const router = useRouter();
   const addLine = useCheckoutStore((s) => s.addLine);
+  const toggleItem = useWishlistStore((s) => s.toggleItem);
+  const isInWishlist = useWishlistStore((s) => s.isInWishlist(product.id));
   const primaryImage = getPrimaryImage(product);
 
   return (
@@ -82,10 +86,29 @@ export default function ProductCard({
           Add to Cart
         </button>
         <button
-          className="grid size-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label={`Save ${product.name}`}
+          onClick={() =>
+            toggleItem({
+              productId: product.id,
+              name: product.name,
+              slug: product.slug,
+              image: primaryImage.url,
+              price: Number(product.price),
+              comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined,
+            })
+          }
+          className={cn(
+            "grid size-8 place-items-center rounded-full transition-colors hover:bg-muted hover:text-foreground",
+            isInWishlist
+              ? "text-[#D46B5A] hover:text-[#D46B5A]"
+              : "text-muted-foreground",
+          )}
+          aria-label={
+            isInWishlist
+              ? `Remove ${product.name} from wishlist`
+              : `Save ${product.name} to wishlist`
+          }
         >
-          <Heart className="size-4" />
+          <Heart className={cn("size-4", isInWishlist && "fill-current")} />
         </button>
       </div>
     </article>

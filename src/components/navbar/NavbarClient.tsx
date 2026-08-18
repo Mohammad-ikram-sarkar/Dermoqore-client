@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Menu, X, ShoppingBag } from "lucide-react";
+import { Search, Menu, X, ShoppingBag, Heart } from "lucide-react";
 import { AccountIcon } from "./icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useCheckoutStore } from "@/store/checkout-store";
+import { useWishlistStore } from "@/store/wishlist-store";
+import SearchOverlay from "@/components/search/SearchOverlay";
 
 interface NavLink {
   label: string;
@@ -35,6 +37,10 @@ export default function NavbarClient({
   const rawCount = useCheckoutStore((s) => s.itemCount());
   const cartCount = hydrated ? rawCount : 0;
 
+  const rawWishlistCount = useWishlistStore((s) => s.count());
+  const wishlistCount = hydrated ? rawWishlistCount : 0;
+
+  const [searchOpen, setSearchOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -71,6 +77,7 @@ export default function NavbarClient({
           size="icon"
           className="hidden h-12 w-12 lg:flex"
           aria-label="Search"
+          onClick={() => setSearchOpen(true)}
         >
           <Search className="size-5" />
         </Button>
@@ -84,6 +91,22 @@ export default function NavbarClient({
           render={<Link href="/account" />}
         >
           <AccountIcon className="size-5" />
+        </Button>
+
+        {/* Wishlist */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative hidden h-12 w-12 lg:flex"
+          aria-label={`Wishlist (${wishlistCount})`}
+          render={<Link href="/wishlist" />}
+        >
+          <Heart className="size-5" />
+          {wishlistCount > 0 && (
+            <Badge className="absolute -top-1 -right-1 flex h-4 w-4 items-center p-0 text-[9px] font-bold rounded-full bg-foreground text-background border-0 justify-center">
+              {wishlistCount}
+            </Badge>
+          )}
         </Button>
 
         {/* Cart */}
@@ -166,6 +189,10 @@ export default function NavbarClient({
                   size="icon"
                   className="h-9 w-9"
                   aria-label="Search"
+                  onClick={() => {
+                    setOpen(false);
+                    setSearchOpen(true);
+                  }}
                 >
                   <Search className="size-4" />
                 </Button>
@@ -177,6 +204,19 @@ export default function NavbarClient({
                   render={<Link href="/account" />}
                 >
                   <AccountIcon className="size-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="relative h-9 w-9"
+                  render={<Link href="/wishlist" aria-label="Wishlist" />}
+                >
+                  <Heart className="size-4" />
+                  {wishlistCount > 0 && (
+                    <Badge className="absolute -top-1 -right-1 flex h-4 w-4 items-center p-0 text-[9px] font-bold rounded-full bg-foreground text-background border-0 justify-center">
+                      {wishlistCount}
+                    </Badge>
+                  )}
                 </Button>
                 <Button
                   variant="outline"
@@ -196,6 +236,8 @@ export default function NavbarClient({
           </SheetContent>
         </Sheet>
       </div>
+
+      <SearchOverlay open={searchOpen} onOpenChange={setSearchOpen} />
     </>
   );
 }
