@@ -7,6 +7,7 @@ import Navbar from "@/components/navbar/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import { FooterServer } from "@/components/footer/FooterServer";
 import ShellWrapper from "@/components/ShellWrapper";
+import { CompanyInfoService } from "@/service/companyinfo.service";
 
 const notoSans = Noto_Sans({subsets:['latin'],variable:'--font-sans'});
 
@@ -20,37 +21,48 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://dermoqore.com"),
-  title: {
-    default: "Dermoqore | Science · Skin · Confidence",
-    template: "%s | Dermoqore",
-  },
-  description: "Dermoqore provides science-backed, clean skincare products designed to build your confidence through healthy, glowing skin.",
-  keywords: ["skincare", "beauty", "dermatologist tested", "clean ingredients", "serum", "dermoqore"],
-  authors: [{ name: "Dermoqore" }],
-  creator: "Dermoqore",
-  publisher: "Dermoqore",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    title: "Dermoqore | Science · Skin · Confidence",
-    description: "Discover our rigorous science-backed skincare formulas that nourish and protect your skin barrier.",
-    url: "https://dermoqore.com",
-    siteName: "Dermoqore",
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Dermoqore | Science · Skin · Confidence",
-    description: "Science-backed skincare products designed to build confidence.",
-    creator: "@dermoqore",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const info = await CompanyInfoService.findFirst();
+  const icon = info?.logoUrl ?? "/faviconimage.png";
+
+  return {
+    metadataBase: new URL("https://dermoqore.com"),
+    title: {
+      default: "Dermoqore | Science · Skin · Confidence",
+      template: "%s | Dermoqore",
+    },
+    description:
+      "Dermoqore provides science-backed, clean skincare products designed to build your confidence through healthy, glowing skin.",
+    keywords: ["skincare", "beauty", "dermatologist tested", "clean ingredients", "serum", "dermoqore"],
+    authors: [{ name: "Dermoqore" }],
+    creator: "Dermoqore",
+    publisher: "Dermoqore",
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    icons: {
+      icon,
+      apple: icon,
+    },
+    openGraph: {
+      title: "Dermoqore | Science · Skin · Confidence",
+      description:
+        "Discover our rigorous science-backed skincare formulas that nourish and protect your skin barrier.",
+      url: "https://dermoqore.com",
+      siteName: "Dermoqore",
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Dermoqore | Science · Skin · Confidence",
+      description: "Science-backed skincare products designed to build confidence.",
+      creator: "@dermoqore",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
