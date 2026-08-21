@@ -3,14 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ChevronLeft,
-  ChevronRight,
-  DropletOff,
-  FlaskConical,
-  Leaf,
-  UserRoundCheck,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import type { Banner as ServiceBanner } from "@/service/banner.type";
 
 type HeroBanner = Pick<
@@ -21,6 +14,15 @@ type HeroBanner = Pick<
 };
 
 type Device = "mobile" | "desktop";
+
+// Matches the admin banner preview background.
+const BANNER_BG = "#F5EDE3";
+
+const TRUST_POINTS = ["Dermatologically Inspired", "Transparent Ingredients", "Alcohol Free"];
+
+const defaultTag = "Science-Backed Skincare";
+const defaultDescription =
+  "Target dark spots, uneven tone and repair your skin barrier with DermoQore Serums.";
 
 /**
  * Picks the banner set for a given viewport. The CMS can ship separate
@@ -43,71 +45,12 @@ interface BannerCarouselProps {
   banners: HeroBanner[];
 }
 
-const trustItems = [
-  {
-    Icon: FlaskConical,
-    label: "Dermatologically",
-    detail: "Inspired",
-  },
-  {
-    Icon: Leaf,
-    label: "Transparent",
-    detail: "Ingredients",
-  },
-  {
-    Icon: UserRoundCheck,
-    label: "Made for",
-    detail: "Bangladeshi Skin",
-  },
-  {
-    Icon: DropletOff,
-    label: "Alcohol Free",
-    detail: "& Fragrance Free",
-  },
-];
-
-const defaultTag = "Science-Backed Skincare";
-const defaultDescription =
-  "Target dark spots, uneven tone and repair your skin barrier with DermoQore Serums.";
-
-function ClinicalBadge() {
-  return (
-    <div className="absolute right-5 top-5 z-20 flex size-20 items-center justify-center rounded-full bg-white text-center text-[8px] font-black leading-[1.35] tracking-[0.14em] text-foreground uppercase shadow-sm ring-1 ring-black/5 sm:right-[9%] sm:top-8 sm:size-24 sm:text-[10px] lg:size-28 lg:text-[11px]">
-      <span>
-        Clinical
-        <br />
-        Formulas
-        <span className="mx-auto my-1 block h-px w-9 bg-border" />
-        Visible
-        <br />
-        Results
-      </span>
-    </div>
-  );
-}
-
-function TrustStrip() {
-  return (
-    <div className="grid max-w-4xl grid-cols-2 gap-x-4 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-6 lg:gap-10">
-      {trustItems.map(({ Icon, label, detail }) => (
-        <div key={label} className="flex min-w-0 items-center gap-2.5 text-foreground/75">
-          <Icon className="size-6 shrink-0 stroke-[1.6] sm:size-7" aria-hidden="true" />
-          <span className="text-[9px] font-semibold leading-tight tracking-[0.02em] sm:text-[10px]">
-            {label}
-            <br />
-            {detail}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [device, setDevice] = useState<Device>("desktop");
 
-  // Track viewport so the CMS can serve device-specific (desktop/mobile) images.
+  // Track viewport so the CMS can serve device-specific (desktop/mobile) images
+  // and the layout can mirror the admin preview's desktop/mobile framing.
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 767px)");
     const update = () => {
@@ -120,6 +63,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   }, []);
 
   const slides = pickDeviceBanners(banners, device);
+  const isMobile = device === "mobile";
 
   const prev = useCallback(
     () => setCurrent((c) => (c === 0 ? slides.length - 1 : c - 1)),
@@ -137,8 +81,8 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   }, [slides.length, next]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-secondary">
-      <div className="relative h-[620px] w-full sm:h-[520px] md:h-[560px] lg:h-[600px]">
+    <section className="relative w-full overflow-hidden" style={{ backgroundColor: BANNER_BG }}>
+      <div className="relative h-[440px] w-full sm:h-[480px] md:h-[520px] lg:h-[580px]">
         {slides.map((banner, i) => {
           const tag = banner.tag?.trim() || defaultTag;
           const description = banner.description?.trim() || defaultDescription;
@@ -148,7 +92,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
             <div
               key={banner.id}
               className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-              style={{ opacity: isActive ? 1 : 0 }}
+              style={{ opacity: isActive ? 1 : 0, backgroundColor: BANNER_BG }}
               aria-hidden={!isActive}
             >
               <Image
@@ -158,41 +102,66 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                 priority={i === 0}
                 loading={i === 0 ? "eager" : "lazy"}
                 sizes="100vw"
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                className="absolute inset-0 h-full w-full object-cover opacity-30"
               />
-              <div className="absolute inset-0 bg-linear-to-r from-background via-background/85 to-background/5 md:via-background/55" />
-              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-background/80 to-transparent" />
-              <ClinicalBadge />
-              <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-between px-6 py-8 md:px-10 md:py-12 lg:py-14">
-                <div className="max-w-xl pt-6 sm:pt-8 lg:pt-2">
-                  <span
-                    className="text-[11px] font-black tracking-[0.16em] text-muted-foreground uppercase md:text-xs"
-                    style={{ color: banner.client?.color }}
-                  >
-                    {tag}
-                  </span>
-                  <h2 className="mt-3 max-w-lg whitespace-pre-line text-4xl font-semibold leading-[0.98] text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-                    {banner.title}
-                  </h2>
-                  <p className="mt-5 max-w-md text-sm font-medium leading-relaxed text-muted-foreground md:text-base">
-                    {description}
-                  </p>
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <Link
-                      href="/shop"
-                      className="inline-flex h-11 items-center justify-center rounded-[5px] bg-foreground px-8 text-[11px] font-bold tracking-[0.12em] text-background uppercase transition-opacity hover:opacity-80"
+
+              <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-between p-6 md:px-10 md:py-16 ">
+                {/* Headline + CTAs */}
+                <div className="flex items-start justify-between gap-6">
+                  <div className={isMobile ? "max-w-[210px]" : "max-w-xl"}>
+                    <p className="text-[9px] tracking-[0.2em] text-stone-500 uppercase md:text-[10px]">
+                      {tag}
+                    </p>
+                    <h2
+                      className={`mt-3 font-semibold leading-[1.05] text-stone-800 ${
+                        isMobile ? "text-[18px]" : "text-4xl md:text-5xl"
+                      }`}
                     >
-                      Shop Now
-                    </Link>
-                    <Link
-                      href="/skin-quiz"
-                      className="inline-flex h-11 items-center justify-center rounded-[5px] border border-foreground/30 bg-background/55 px-8 text-[11px] font-bold tracking-[0.12em] text-foreground uppercase backdrop-blur-sm transition-colors hover:bg-background/90"
-                    >
-                      Find Your Serum
-                    </Link>
+                      {banner.title}
+                    </h2>
+                    <p className="mt-3 text-[11px] leading-relaxed text-stone-500 md:text-[13px]">
+                      {description}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <Link
+                        href="/shop"
+                        className="inline-flex items-center justify-center bg-stone-900 px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-white uppercase transition-opacity hover:opacity-80 md:px-7 md:py-3 md:text-[11px]"
+                      >
+                        Shop Now
+                      </Link>
+                      <Link
+                        href="/skin-quiz"
+                        className="inline-flex items-center justify-center border border-stone-400 px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-stone-700 uppercase transition-colors hover:bg-stone-900/5 md:px-7 md:py-3 md:text-[11px]"
+                      >
+                        Find Your Serum
+                      </Link>
+                    </div>
                   </div>
+
+                  {/* Desktop-only clinical tag (mirrors admin preview) */}
+                  {!isMobile && (
+                    <div className="hidden text-right md:block">
+                      <p className="text-[9px] tracking-[0.15em] text-stone-400 uppercase">
+                        Clinical Formulas
+                      </p>
+                      <p className="text-[9px] tracking-[0.15em] text-stone-400 uppercase">
+                        Visible Results
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <TrustStrip />
+
+                {/* Desktop-only trust strip (mirrors admin preview) */}
+                {!isMobile && (
+                  <div className="flex flex-wrap gap-5">
+                    {TRUST_POINTS.map((point) => (
+                      <div key={point} className="flex items-center gap-1.5 text-stone-500">
+                        <Check className="size-3.5" strokeWidth={2} />
+                        <span className="text-[11px]">{point}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -203,14 +172,14 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 z-30 -translate-y-1/2 rounded-full bg-background/70 p-2 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background"
+            className="absolute left-3 top-1/2 z-30 -translate-y-1/2 rounded-full bg-white/70 p-2 text-stone-800 shadow-sm backdrop-blur-sm transition-colors hover:bg-white"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 z-30 -translate-y-1/2 rounded-full bg-background/70 p-2 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background"
+            className="absolute right-3 top-1/2 z-30 -translate-y-1/2 rounded-full bg-white/70 p-2 text-stone-800 shadow-sm backdrop-blur-sm transition-colors hover:bg-white"
             aria-label="Next slide"
           >
             <ChevronRight className="h-5 w-5" />
@@ -222,7 +191,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                 key={i}
                 onClick={() => setCurrent(i)}
                 className={`h-2 rounded-full transition-all ${
-                  i === current ? "w-6 bg-foreground" : "w-2 bg-foreground/35"
+                  i === current ? "w-6 bg-stone-800" : "w-2 bg-stone-400"
                 }`}
                 aria-label={`Go to slide ${i + 1}`}
               />
