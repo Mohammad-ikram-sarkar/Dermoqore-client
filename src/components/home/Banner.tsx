@@ -8,6 +8,7 @@ const fallbackBanner = {
   description:
     "Target dark spots, uneven tone and repair your skin barrier with DermoQore Serums.",
   imageUrl: "/ChatGPT Image Jun 12, 2026, 10_30_13 AM.png",
+  device: "desktop",
 };
 
 export default async function Banner() {

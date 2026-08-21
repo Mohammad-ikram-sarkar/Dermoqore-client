@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,10 +15,29 @@ import type { Banner as ServiceBanner } from "@/service/banner.type";
 
 type HeroBanner = Pick<
   ServiceBanner,
-  "id" | "title" | "tag" | "description" | "imageUrl"
+  "id" | "title" | "tag" | "description" | "imageUrl" | "device"
 > & {
   client?: Pick<ServiceBanner["client"], "color">;
 };
+
+type Device = "mobile" | "desktop";
+
+/**
+ * Picks the banner set for a given viewport. The CMS can ship separate
+ * `device` images (e.g. a cropped portrait for phones, a wide hero for desktop).
+ * Falls back gracefully when only one variant exists.
+ */
+function pickDeviceBanners(banners: HeroBanner[], device: Device): HeroBanner[] {
+  if (banners.length <= 1) return banners;
+
+  const byDevice = (d: Device) => banners.filter((b) => b.device === d);
+  const primary = byDevice(device);
+  if (primary.length > 0) return primary;
+
+  // No variant for this device — use the opposite one as a fallback.
+  const other = byDevice(device === "mobile" ? "desktop" : "mobile");
+  return other.length > 0 ? other : banners;
+}
 
 interface BannerCarouselProps {
   banners: HeroBanner[];
@@ -85,39 +105,60 @@ function TrustStrip() {
 
 export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const [current, setCurrent] = useState(0);
+  const [device, setDevice] = useState<Device>("desktop");
+
+  // Track viewport so the CMS can serve device-specific (desktop/mobile) images.
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    const update = () => {
+      setDevice(mql.matches ? "mobile" : "desktop");
+      setCurrent(0);
+    };
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
+  const slides = pickDeviceBanners(banners, device);
 
   const prev = useCallback(
-    () => setCurrent((c) => (c === 0 ? banners.length - 1 : c - 1)),
-    [banners.length],
+    () => setCurrent((c) => (c === 0 ? slides.length - 1 : c - 1)),
+    [slides.length],
   );
   const next = useCallback(
-    () => setCurrent((c) => (c === banners.length - 1 ? 0 : c + 1)),
-    [banners.length],
+    () => setCurrent((c) => (c === slides.length - 1 ? 0 : c + 1)),
+    [slides.length],
   );
 
   useEffect(() => {
-    if (banners.length <= 1) return;
+    if (slides.length <= 1) return;
     const id = setInterval(next, 5000);
     return () => clearInterval(id);
-  }, [banners.length, next]);
+  }, [slides.length, next]);
 
   return (
     <section className="relative w-full overflow-hidden bg-secondary">
       <div className="relative h-[620px] w-full sm:h-[520px] md:h-[560px] lg:h-[600px]">
-        {banners.map((banner, i) => {
+        {slides.map((banner, i) => {
           const tag = banner.tag?.trim() || defaultTag;
           const description = banner.description?.trim() || defaultDescription;
+          const isActive = i === current;
 
           return (
             <div
               key={banner.id}
               className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-              style={{ opacity: i === current ? 1 : 0 }}
+              style={{ opacity: isActive ? 1 : 0 }}
+              aria-hidden={!isActive}
             >
-              <img
+              <Image
                 src={banner.imageUrl!}
                 alt={banner.title}
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                sizes="100vw"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
               <div className="absolute inset-0 bg-linear-to-r from-background via-background/85 to-background/5 md:via-background/55" />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-background/80 to-transparent" />
@@ -158,7 +199,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
         })}
       </div>
 
-      {banners.length > 1 && (
+      {slides.length > 1 && (
         <>
           <button
             onClick={prev}
@@ -176,7 +217,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           </button>
 
           <div className="absolute bottom-5 right-6 z-30 flex gap-2">
-            {banners.map((_, i) => (
+            {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
